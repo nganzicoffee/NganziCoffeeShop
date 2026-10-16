@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /admin
+Disallow: /admin/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders/
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /webhooks/
+
+# Sitemaps
+Sitemap: https://nganzicoffee.com/sitemap.xml

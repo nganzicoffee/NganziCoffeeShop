@@ -1,0 +1,6 @@
+# -----------------------------------------------------------------------------
+# Nganzi Coffee — Laravel Scheduler Cron Entry
+# Install into crontab: crontab -e -u www-data
+# -----------------------------------------------------------------------------
+
+* * * * * cd /var/www/nganzicoffee.com && php artisan schedule:run >> /dev/null 2>&1
