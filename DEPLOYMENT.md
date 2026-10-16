@@ -208,9 +208,28 @@ Add the following line:
 
 ---
 
-## 7. Zero-Downtime Deployment Script
+## 7. Zero-Downtime Deployment & Automated CI/CD
 
-Whenever you push updates to `main`, deploy seamlessly by executing `./deploy.sh` on the server:
+### 7.1 Automated Deployment via GitHub Actions (Recommended)
+
+This repository includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) that automatically deploys changes whenever commits are pushed to `main` and test checks pass.
+
+To enable automated deployment:
+
+1. In your GitHub repository, navigate to **Settings** > **Secrets and variables** > **Actions**.
+2. Add the following repository secrets:
+   - **`SSH_HOST`**: Server IP address or domain (e.g., `198.51.100.1` or `nganzicoffee.com`).
+   - **`SSH_USER`**: SSH login user (e.g., `ubuntu` or `deploy`).
+   - **`SSH_KEY`**: The private SSH key for the user (matching the public key added to `~/.ssh/authorized_keys` on the server).
+   - **`SSH_PORT`**: *(Optional)* SSH port if non-standard (defaults to `22`).
+
+Once configured, pushing to `main` will automatically connect via SSH, run `bash deploy.sh`, and refresh the live site without downtime!
+
+---
+
+### 7.2 Manual Deployment Script
+
+You can also trigger a deployment manually at any time by executing `./deploy.sh` on the server:
 
 ```bash
 chmod +x deploy.sh
