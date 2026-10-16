@@ -10,7 +10,7 @@ This guide details the complete deployment procedure for **`nganzicoffee.com`** 
 | -------------------- | ----------------------------------------------- |
 | **Primary Domain**   | `nganzicoffee.com` (and `www.nganzicoffee.com`) |
 | **Operating System** | Ubuntu 22.04 LTS or 24.04 LTS                   |
-| **Backend Runtime**  | PHP 8.3+ (with PHP-FPM)                         |
+| **Backend Runtime**  | PHP 8.4+ (with PHP-FPM)                         |
 | **Database**         | MySQL 8.0+ / MariaDB 10.11+                     |
 | **Web Server**       | Nginx with HTTP/2 and Let's Encrypt SSL         |
 | **Process Manager**  | Supervisor (for Laravel Queue Workers)          |
@@ -34,10 +34,10 @@ sudo apt install -y curl git unzip ufw software-properties-common
 sudo add-apt-repository -y ppa:ondrej/php
 sudo apt update
 
-# Install PHP 8.3 and required extensions
-sudo apt install -y php8.3-fpm php8.3-cli php8.3-mysql php8.3-mbstring \
-    php8.3-xml php8.3-bcmath php8.3-curl php8.3-zip php8.3-intl \
-    php8.3-gd php8.3-tokenizer
+# Install PHP 8.4 and required extensions (Pest 5, Symfony 8.1 require PHP >= 8.4.1)
+sudo apt install -y php8.4-fpm php8.4-cli php8.4-mysql php8.4-mbstring \
+    php8.4-xml php8.4-bcmath php8.4-curl php8.4-zip php8.4-intl \
+    php8.4-gd php8.4-tokenizer
 
 # Install Composer 2
 curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
