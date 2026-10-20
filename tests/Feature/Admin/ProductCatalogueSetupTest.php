@@ -28,7 +28,7 @@ test('catalogue staff can create pack prices stock and both images in one submis
     expect($product->variants()->count())->toBe(2);
     expect($product->variants()->where('label', '250g')->firstOrFail()->price_minor)->toBe(25000);
     expect($product->variants()->where('label', '250g')->firstOrFail()->stock)->toBe(30);
-    expect(InventoryMovement::where('actor_id', $staff->id)->sum('delta'))->toBe(42);
+    expect((int) InventoryMovement::where('actor_id', $staff->id)->sum('delta'))->toBe(42);
     expect($product->images()->count())->toBe(2);
     expect($product->images->first()->alt)->toContain('front');
     expect($product->images->last()->alt)->toContain('back');
