@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\InventoryReason;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreVariantRequest;
 use App\Http\Requests\Admin\UpdateVariantRequest;
+use App\Models\InventoryMovement;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\InventoryMovement;
-use App\Enums\InventoryReason;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 
 class VariantController extends Controller
 {

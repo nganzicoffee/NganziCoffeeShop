@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\StaffRole;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Model;
@@ -16,10 +17,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $token
  * @property string $code_hash
  * @property int $attempts
- * @property \Carbon\CarbonImmutable $expires_at
- * @property \Carbon\CarbonImmutable|null $sent_at
- * @property \Carbon\CarbonImmutable|null $accepted_at
- * @property \Carbon\CarbonImmutable|null $revoked_at
+ * @property CarbonImmutable $expires_at
+ * @property CarbonImmutable|null $sent_at
+ * @property CarbonImmutable|null $accepted_at
+ * @property CarbonImmutable|null $revoked_at
  */
 #[Fillable(['name', 'email', 'role', 'invited_by', 'token', 'code_hash', 'attempts', 'expires_at', 'sent_at', 'accepted_at', 'revoked_at'])]
 #[Hidden(['code_hash', 'token'])]

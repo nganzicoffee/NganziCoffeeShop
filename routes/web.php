@@ -17,8 +17,8 @@ use App\Http\Controllers\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\Shop\ShopController;
 use App\Http\Controllers\Shop\SitemapController;
 use App\Http\Controllers\Shop\StaticPageController;
-use App\Http\Middleware\EnsureStaff;
 use App\Http\Controllers\StaffInvitationController;
+use App\Http\Middleware\EnsureStaff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\CartService;
+use App\Services\ShopSettingsService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -45,7 +46,7 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'shop' => [
                 'currency' => config('shop.currency'),
-                'usdExchangeRate' => app(\App\Services\ShopSettingsService::class)->usdExchangeRate(),
+                'usdExchangeRate' => app(ShopSettingsService::class)->usdExchangeRate(),
             ],
             'cartCount' => fn () => app(CartService::class)->itemCount($request),
             'flash' => [

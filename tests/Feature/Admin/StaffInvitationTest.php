@@ -6,8 +6,9 @@ use App\Models\StaffInvitation;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Tests\TestCase;
 
-function inviteStaffForTest(Tests\TestCase $test): StaffInvitationMail
+function inviteStaffForTest(TestCase $test): StaffInvitationMail
 {
     Mail::fake();
     $owner = User::factory()->create(['role' => StaffRole::Owner]);
