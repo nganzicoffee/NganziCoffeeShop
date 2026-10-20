@@ -1888,10 +1888,6 @@
         background: rgba(255, 255, 255, 0.12);
     }
 
-    .shop-page-actions {
-        flex-wrap: nowrap;
-    }
-
     .shop-page-actions > * {
         flex: 0 0 auto;
     }
@@ -2126,10 +2122,6 @@
         background: var(--brown);
     }
 
-    .shop-international-card .button-light {
-        margin-top: 24px;
-    }
-
     @media (max-width: 800px) {
         .shop-roast-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2142,7 +2134,7 @@
 
     @media (max-width: 700px) {
         .shop-page-hero {
-            min-height: 650px;
+            min-height: 620px;
         }
 
         .shop-page-hero .hero-overlay {
@@ -2154,7 +2146,7 @@
         }
 
         .shop-page-intro {
-            padding-block: 150px 75px;
+            padding-block: 140px 65px;
         }
 
         .shop-page-intro h1 {
@@ -2162,20 +2154,23 @@
         }
 
         .shop-page-actions {
+            flex-wrap: wrap;
             align-items: center;
-            flex-direction: row;
+            gap: 12px;
         }
 
         .shop-page-actions .button {
-            justify-content: space-between;
-            padding-inline: 8px;
-            font-size: clamp(0.6rem, 2.8vw, 0.87rem);
+            min-height: 48px;
+            padding: 12px 18px;
+            gap: 12px;
+            font-size: 0.85rem;
             white-space: nowrap;
         }
 
         .shop-marketplace-logo {
-            width: 96px;
-            padding-inline: 6px;
+            height: 48px;
+            width: 104px;
+            padding-inline: 8px;
         }
 
         .shop-roast-grid {
