@@ -34,14 +34,14 @@ class ProductImageController extends Controller
 
         try {
             DB::transaction(function () use ($product, $path, $request): void {
-                Product::query()->whereKey($product->id)->lockForUpdate()->firstOrFail();
-                if ($product->images()->count() >= 2) {
+                $lockedProduct = Product::query()->whereKey($product->id)->lockForUpdate()->firstOrFail();
+                if ($lockedProduct->images()->count() >= 2) {
                     throw ValidationException::withMessages(['image' => 'Both image positions are already filled.']);
                 }
-                $product->images()->create([
+                $lockedProduct->images()->create([
                     'path' => $path,
-                    'alt' => $request->input('alt', $product->name),
-                    'sort_order' => (int) $product->images()->max('sort_order') + 1,
+                    'alt' => $request->input('alt', $lockedProduct->name),
+                    'sort_order' => (int) $lockedProduct->images()->max('sort_order') + 1,
                 ]);
             });
         } catch (\Throwable $exception) {
