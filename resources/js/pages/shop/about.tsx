@@ -301,7 +301,7 @@ export default function About() {
                     <figure className="story-women-image">
                         <img
                             src="/assets/images/woman-in-coffee-farm.webp"
-                            alt="A woman tending coffee plants on a farm"
+                            alt="A woman farmer pruning coffee plants at Nganzi Coffee farm"
                             loading="lazy"
                         />
                     </figure>

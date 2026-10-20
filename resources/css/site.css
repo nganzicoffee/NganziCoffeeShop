@@ -2516,6 +2516,105 @@
         line-height: 1;
     }
 
+    .farm-gallery {
+        background: var(--paper);
+    }
+
+    .farm-gallery-grid figure {
+        border-radius: 4px;
+        box-shadow: 0 10px 26px rgba(35, 22, 12, 0.08);
+        transition:
+            transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 380ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .farm-gallery-grid figure:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 36px rgba(35, 22, 12, 0.16);
+    }
+
+    .farm-gallery-grid img {
+        transition: transform 550ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .farm-gallery-grid figure:hover img {
+        transform: scale(1.06);
+    }
+
+    .farm-gallery-caption {
+        position: absolute;
+        inset: auto 0 0 0;
+        display: flex;
+        align-items: flex-end;
+        padding: 28px 18px 14px;
+        background: linear-gradient(
+            180deg,
+            rgba(28, 19, 14, 0) 0%,
+            rgba(28, 19, 14, 0.78) 100%
+        );
+        color: white;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+            opacity 280ms ease,
+            transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+        pointer-events: none;
+    }
+
+    .farm-gallery-grid figure:hover .farm-gallery-caption,
+    .farm-gallery-grid figure:focus-within .farm-gallery-caption {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    [data-reveal] {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+            opacity 650ms cubic-bezier(0.22, 1, 0.36, 1),
+            transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: opacity, transform;
+    }
+
+    [data-reveal].is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    [data-reveal-delay='1'] {
+        transition-delay: 80ms;
+    }
+
+    [data-reveal-delay='2'] {
+        transition-delay: 160ms;
+    }
+
+    [data-reveal-delay='3'] {
+        transition-delay: 240ms;
+    }
+
+    [data-reveal-delay='4'] {
+        transition-delay: 320ms;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        [data-reveal] {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+
+        .farm-gallery-grid figure,
+        .farm-gallery-grid img,
+        .farm-gallery-caption {
+            transition: none;
+        }
+    }
+
     .story-processing {
         position: relative;
         isolation: isolate;

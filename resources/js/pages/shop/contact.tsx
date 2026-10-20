@@ -145,8 +145,8 @@ export default function Contact() {
 
                     <div className="contact-visual-panel">
                         <img
-                            src="/assets/images/woman-in-coffee-farm.webp"
-                            alt="Woman working among coffee plants"
+                            src="/assets/images/contact-nganzi-coffee.webp"
+                            alt="Holding a pouch of Nganzi Coffee among coffee trees on the farm"
                             loading="lazy"
                         />
                     </div>

@@ -187,7 +187,7 @@ export default function Welcome() {
                 <div className="about-grid container">
                     <div className="about-label" aria-hidden="true" />
 
-                    <div className="about-copy">
+                    <div className="about-copy" data-reveal>
                         <h2>
                             From Uganda’s highlands, every cup carries a{' '}
                             <span className="script-accent">story.</span>
@@ -200,7 +200,11 @@ export default function Welcome() {
                         </p>
                     </div>
 
-                    <div className="about-image-wrap">
+                    <div
+                        className="about-image-wrap"
+                        data-reveal
+                        data-reveal-delay="1"
+                    >
                         <p className="about-image-label">Rooted in Uganda</p>
                         <img
                             src="/assets/images/coffee-origin.webp"
@@ -209,12 +213,17 @@ export default function Welcome() {
                         />
                     </div>
 
-                    <p className="about-note">
+                    <p className="about-note" data-reveal data-reveal-delay="1">
                         Discover the people, inspiration and passion behind
                         every Nganzi Coffee experience.
                     </p>
                     <div className="about-rule" aria-hidden="true" />
-                    <Link href="/about" className="text-link about-link">
+                    <Link
+                        href="/about"
+                        className="text-link about-link"
+                        data-reveal
+                        data-reveal-delay="2"
+                    >
                         Learn More
                         <svg
                             className="arrow-icon arrow-right"
@@ -231,7 +240,7 @@ export default function Welcome() {
             {/* 3. FEATURED COFFEE */}
             <section className="coffee-section section-padding" id="coffee">
                 <div className="container">
-                    <div className="section-heading">
+                    <div className="section-heading" data-reveal>
                         <div>
                             <h2>Explore coffee for every ritual.</h2>
                         </div>
@@ -273,7 +282,11 @@ export default function Welcome() {
                             tabIndex={0}
                             aria-label="Featured coffee products"
                         >
-                            <article className="product-card">
+                            <article
+                                className="product-card"
+                                data-reveal
+                                data-reveal-delay="1"
+                            >
                                 <Link
                                     href="/coffee#light-roast"
                                     className="product-image"
@@ -304,7 +317,11 @@ export default function Welcome() {
                                 </div>
                             </article>
 
-                            <article className="product-card">
+                            <article
+                                className="product-card"
+                                data-reveal
+                                data-reveal-delay="2"
+                            >
                                 <Link
                                     href="/coffee#medium-roast"
                                     className="product-image"
@@ -335,7 +352,11 @@ export default function Welcome() {
                                 </div>
                             </article>
 
-                            <article className="product-card">
+                            <article
+                                className="product-card"
+                                data-reveal
+                                data-reveal-delay="3"
+                            >
                                 <Link
                                     href="/coffee#dark-roast"
                                     className="product-image"
@@ -368,7 +389,11 @@ export default function Welcome() {
                                 </div>
                             </article>
 
-                            <article className="product-card">
+                            <article
+                                className="product-card"
+                                data-reveal
+                                data-reveal-delay="4"
+                            >
                                 <Link
                                     href="/coffee#raw-coffee-beans"
                                     className="product-image"
@@ -423,10 +448,69 @@ export default function Welcome() {
                 </div>
             </section>
 
-            {/* 4. SHOP CTA */}
+            {/* 4. FARM GALLERY */}
+            <section className="farm-gallery section-padding" id="farm-gallery">
+                <div className="container">
+                    <div className="story-processing-heading" data-reveal>
+                        <h2>
+                            Grown with care at{' '}
+                            <span className="script-accent">origin.</span>
+                        </h2>
+                        <p>
+                            Every harvest at Komurubuga Farm begins with healthy
+                            trees, patient cultivation, and careful hand-picking
+                            by the women and families behind Nganzi Coffee.
+                        </p>
+                    </div>
+                    <div className="roaster-gallery farm-gallery-grid">
+                        <figure data-reveal data-reveal-delay="1">
+                            <img
+                                src="/assets/images/farm-gallery-1.webp"
+                                alt="Coffee branches heavily laden with green cherries at Komurubuga Farm"
+                                loading="lazy"
+                            />
+                            <figcaption className="farm-gallery-caption">
+                                <span>Komurubuga Farm</span>
+                            </figcaption>
+                        </figure>
+                        <figure data-reveal data-reveal-delay="2">
+                            <img
+                                src="/assets/images/farm-gallery-2.webp"
+                                alt="Inspecting ripening coffee cherries under the farm canopy"
+                                loading="lazy"
+                            />
+                            <figcaption className="farm-gallery-caption">
+                                <span>Careful Cultivation</span>
+                            </figcaption>
+                        </figure>
+                        <figure data-reveal data-reveal-delay="3">
+                            <img
+                                src="/assets/images/farm-gallery-3.webp"
+                                alt="Sunlit branch of red and golden ripening coffee cherries"
+                                loading="lazy"
+                            />
+                            <figcaption className="farm-gallery-caption">
+                                <span>Ripening Harvest</span>
+                            </figcaption>
+                        </figure>
+                        <figure data-reveal data-reveal-delay="4">
+                            <img
+                                src="/assets/images/farm-gallery-4.webp"
+                                alt="Freshly harvested red coffee cherries held in cupped hands"
+                                loading="lazy"
+                            />
+                            <figcaption className="farm-gallery-caption">
+                                <span>Hand-Picked Cherries</span>
+                            </figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            {/* 5. SHOP CTA */}
             <section className="shop-cta">
                 <div className="shop-cta-inner container">
-                    <div className="shop-cta-content">
+                    <div className="shop-cta-content" data-reveal>
                         <h2>
                             Find your kind of{' '}
                             <span className="script-accent">coffee.</span>
