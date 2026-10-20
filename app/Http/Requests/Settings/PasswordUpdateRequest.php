@@ -20,6 +20,7 @@ class PasswordUpdateRequest extends FormRequest
         return [
             'current_password' => $this->currentPasswordRules(),
             'password' => $this->passwordRules(),
+            'code' => ['required', 'string', 'regex:/^[0-9]{6}$/'],
         ];
     }
 }

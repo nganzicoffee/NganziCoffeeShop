@@ -2,6 +2,8 @@
 @import 'tw-animate-css';
 @import './site.css';
 
+@custom-variant dark (&:is(.dark *));
+
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
@@ -402,4 +404,168 @@
         text-decoration: line-through;
         font-weight: 400;
     }
+}
+
+/* ─── Admin Panel Dark Mode ──────────────────────────────────── */
+html.dark {
+    --color-background: #14110f;
+    --color-foreground: #f5efe6;
+    --color-card: #1c1815;
+    --color-card-foreground: #f5efe6;
+    --color-popover: #1c1815;
+    --color-popover-foreground: #f5efe6;
+    --color-secondary: #26201b;
+    --color-secondary-foreground: #f5efe6;
+    --color-muted-foreground: #a39587;
+    --color-accent: #26201b;
+    --color-accent-foreground: #f5efe6;
+    --color-border-color: #332b25;
+    --color-input: #332b25;
+    --color-sidebar: #181412;
+    --color-sidebar-foreground: #f5efe6;
+    --color-sidebar-accent: #26201b;
+    --color-sidebar-accent-foreground: #f5efe6;
+    --color-sidebar-border: #2e2722;
+}
+
+html.dark [data-slot='sidebar-wrapper'],
+html.dark [data-radix-popper-content-wrapper],
+html.dark [data-slot='dialog-content'],
+html.dark [data-slot='sheet-content'] {
+    --color-cream: #14110f;
+    --color-paper: #1c1815;
+    --color-peach: #28211b;
+    --color-text: #f5efe6;
+    --color-brown: #faf5ee;
+    --color-brown-light: #d8cab8;
+    --color-muted: #a39587;
+    --color-border: #332b25;
+    color: var(--color-text);
+}
+
+html.dark [data-slot='sidebar-wrapper'] {
+    background-color: #14110f;
+}
+
+html.dark [data-slot='sidebar-wrapper'] [data-slot='sidebar-inset'],
+html.dark [data-slot='sidebar-wrapper'] main {
+    background-color: #14110f;
+    color: var(--color-text);
+}
+
+html.dark [data-slot='sidebar-wrapper'] .bg-white,
+html.dark [data-radix-popper-content-wrapper] .bg-white,
+html.dark [data-slot='dialog-content'].bg-white,
+html.dark [data-slot='sheet-content'].bg-white {
+    background-color: #1c1815;
+}
+
+html.dark [data-slot='sidebar-wrapper'] main.bg-white {
+    background-color: #14110f;
+}
+
+html.dark [data-slot='sidebar-wrapper'] .bg-stone-50,
+html.dark [data-slot='sidebar-wrapper'] .bg-stone-50\/50,
+html.dark [data-slot='sidebar-wrapper'] .bg-stone-50\/40,
+html.dark [data-slot='sidebar-wrapper'] .bg-stone-100 {
+    background-color: #26201b;
+}
+
+html.dark [data-slot='sidebar-wrapper'] .hover\:bg-stone-50\/50:hover,
+html.dark [data-slot='sidebar-wrapper'] .hover\:bg-stone-100:hover,
+html.dark [data-slot='sidebar-wrapper'] .hover\:bg-stone-100\!:hover,
+html.dark
+    [data-slot='sidebar-wrapper']
+    [data-state='open'].data-\[state\=open\]\:bg-stone-100 {
+    background-color: #29221c !important;
+}
+
+html.dark [data-slot='sidebar-wrapper'] .text-stone-600,
+html.dark [data-slot='sidebar-wrapper'] .text-stone-700 {
+    color: #d8cab8;
+}
+
+html.dark [data-slot='sidebar-wrapper'] .border-stone-200 {
+    border-color: #382f28;
+}
+
+html.dark [data-slot='sidebar-wrapper'] .nganzi-input,
+html.dark [data-slot='dialog-content'] .nganzi-input {
+    background-color: #14110f;
+    color: #f5efe6;
+    border-color: #382f28;
+    color-scheme: dark;
+}
+
+html.dark [data-slot='sidebar-wrapper'] img[src*='logo.svg'] {
+    filter: brightness(0) invert(1);
+}
+
+html.dark [data-slot='sidebar-wrapper'] .bg-emerald-50,
+html.dark [data-slot='sidebar-wrapper'] .bg-emerald-100 {
+    background-color: rgba(16, 185, 129, 0.16);
+}
+html.dark [data-slot='sidebar-wrapper'] .text-emerald-700,
+html.dark [data-slot='sidebar-wrapper'] .text-emerald-800,
+html.dark [data-slot='sidebar-wrapper'] .text-emerald-900 {
+    color: #6ee7b7;
+}
+html.dark [data-slot='sidebar-wrapper'] .border-emerald-200 {
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+html.dark [data-slot='sidebar-wrapper'] .bg-amber-50,
+html.dark [data-slot='sidebar-wrapper'] .bg-amber-100 {
+    background-color: rgba(245, 158, 11, 0.16);
+}
+html.dark [data-slot='sidebar-wrapper'] .text-amber-700,
+html.dark [data-slot='sidebar-wrapper'] .text-amber-800,
+html.dark [data-slot='sidebar-wrapper'] .text-amber-900 {
+    color: #fcd34d;
+}
+html.dark [data-slot='sidebar-wrapper'] .border-amber-200 {
+    border-color: rgba(245, 158, 11, 0.35);
+}
+
+html.dark [data-slot='sidebar-wrapper'] .bg-rose-50,
+html.dark [data-slot='sidebar-wrapper'] .bg-red-50 {
+    background-color: rgba(244, 63, 94, 0.16);
+}
+html.dark [data-slot='sidebar-wrapper'] .text-rose-700,
+html.dark [data-slot='sidebar-wrapper'] .text-rose-800,
+html.dark [data-slot='sidebar-wrapper'] .text-red-800,
+html.dark [data-slot='sidebar-wrapper'] .text-red-900 {
+    color: #fda4af;
+}
+html.dark [data-slot='sidebar-wrapper'] .border-rose-200,
+html.dark [data-slot='sidebar-wrapper'] .border-red-200 {
+    border-color: rgba(244, 63, 94, 0.35);
+}
+
+html.dark [data-slot='sidebar-wrapper'] .bg-sky-50 {
+    background-color: rgba(14, 165, 233, 0.16);
+}
+html.dark [data-slot='sidebar-wrapper'] .text-sky-800,
+html.dark [data-slot='sidebar-wrapper'] .text-sky-900 {
+    color: #7dd3fc;
+}
+html.dark [data-slot='sidebar-wrapper'] .border-sky-200 {
+    border-color: rgba(14, 165, 233, 0.35);
+}
+
+html.dark [data-slot='sidebar-wrapper'] .bg-indigo-50 {
+    background-color: rgba(99, 102, 241, 0.16);
+}
+html.dark [data-slot='sidebar-wrapper'] .text-indigo-900 {
+    color: #a5b4fc;
+}
+html.dark [data-slot='sidebar-wrapper'] .border-indigo-200 {
+    border-color: rgba(99, 102, 241, 0.35);
+}
+
+html.dark [data-slot='sidebar-wrapper'] .bg-purple-100 {
+    background-color: rgba(168, 85, 247, 0.16);
+}
+html.dark [data-slot='sidebar-wrapper'] .text-purple-900 {
+    color: #d8b4fe;
 }

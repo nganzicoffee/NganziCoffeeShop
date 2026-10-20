@@ -44,6 +44,16 @@ test('only owners can invite staff including other owners', function () {
     Mail::assertSent(StaffInvitationMail::class);
 });
 
+test('invitation acceptance page renders and sets no-store headers', function () {
+    inviteStaffForTest($this);
+    $invitation = StaffInvitation::firstOrFail();
+
+    $this->get('/staff-invitations/'.$invitation->token)
+        ->assertOk()
+        ->assertHeader('Referrer-Policy', 'no-referrer')
+        ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+});
+
 test('invitation acceptance verifies email creates selected role and cannot be replayed', function () {
     $mail = inviteStaffForTest($this);
     $invitation = StaffInvitation::firstOrFail();

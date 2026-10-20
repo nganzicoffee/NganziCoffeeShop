@@ -41,12 +41,29 @@ const isDarkMode = (appearance: Appearance): boolean => {
     return appearance === 'dark' || (appearance === 'system' && prefersDark());
 };
 
+const isAdminPanelRoute = (): boolean => {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    const path = window.location.pathname;
+
+    return (
+        path === '/admin' ||
+        path.startsWith('/admin/') ||
+        path === '/settings' ||
+        path.startsWith('/settings/') ||
+        path === '/dashboard' ||
+        document.querySelector('[data-slot="sidebar-wrapper"]') !== null
+    );
+};
+
 const applyTheme = (appearance: Appearance): void => {
     if (typeof document === 'undefined') {
         return;
     }
 
-    const isDark = isDarkMode(appearance);
+    const isDark = isAdminPanelRoute() && isDarkMode(appearance);
 
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';

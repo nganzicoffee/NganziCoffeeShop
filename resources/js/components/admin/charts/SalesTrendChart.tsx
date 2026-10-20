@@ -93,7 +93,7 @@ export function SalesTrendChart({ data, currency, periodLabel }: Props) {
                             </defs>
                             <CartesianGrid
                                 strokeDasharray="3 3"
-                                stroke="#F1ECE5"
+                                stroke="var(--color-border)"
                                 vertical={false}
                             />
                             <XAxis

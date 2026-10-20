@@ -94,8 +94,20 @@
         <link rel="icon" href="/images/brand/favicon-large.png" type="image/png">
         <link rel="apple-touch-icon" href="/images/brand/favicon-large.png">
 
-        {{-- Inline: set cream background immediately to prevent flash --}}
-        <style>html { background-color: #FFF8EE; }</style>
+        {{-- Inline: set cream background and admin dark mode immediately to prevent flash --}}
+        <style>html { background-color: #FFF8EE; } html.dark { background-color: #14110F; }</style>
+        @if (request()->is('admin', 'admin/*', 'settings', 'settings/*', 'dashboard'))
+            <script>
+                (function () {
+                    const appearance = localStorage.getItem('appearance') || '{{ $appearance ?? 'system' }}';
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (appearance === 'dark' || (appearance === 'system' && prefersDark)) {
+                        document.documentElement.classList.add('dark');
+                        document.documentElement.style.colorScheme = 'dark';
+                    }
+                })();
+            </script>
+        @endif
 
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
