@@ -8,8 +8,16 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\InventoryMovement;
+use App\Enums\InventoryReason;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Throwable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -49,7 +57,54 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request): RedirectResponse
     {
-        $product = Product::create($request->validated());
+        /** @var list<string> $paths */
+        $paths = [];
+        $disk = (string) config('shop.media_disk', 'public');
+        try {
+            $product = DB::transaction(function () use ($request, &$paths, $disk): Product {
+                $data = $request->validated();
+                if (empty($data['category_id'])) {
+                    $category = Category::firstOrCreate(
+                        ['slug' => Str::slug($data['category_name']) ?: Str::lower(Str::random(12))],
+                        ['name' => trim($data['category_name']), 'sort_order' => 0],
+                    );
+                    $data['category_id'] = $category->id;
+                }
+                $product = Product::create(Arr::except($data, ['category_name', 'variants', 'front_image', 'back_image']));
+                foreach ($data['variants'] ?? [] as $variantData) {
+                    $variant = $product->variants()->create([...$variantData, 'active' => true]);
+                    InventoryMovement::create([
+                        'variant_id' => $variant->id,
+                        'actor_id' => $request->user()->id,
+                        'reason' => InventoryReason::InitialStock,
+                        'delta' => $variant->stock,
+                        'stock_before' => 0,
+                        'stock_after' => $variant->stock,
+                        'note' => 'Initial stock recorded when creating product.',
+                    ]);
+                }
+                foreach (['front_image', 'back_image'] as $position => $field) {
+                    $file = $request->file($field);
+                    if ($file instanceof UploadedFile) {
+                        $path = $file->store("products/{$product->id}", $disk);
+                        if ($path === false) {
+                            throw new \RuntimeException('Product image could not be saved.');
+                        }
+                        $paths[] = $path;
+                        $product->images()->create([
+                            'path' => $path,
+                            'alt' => $product->name.($position === 0 ? ' — front' : ' — back'),
+                            'sort_order' => $position,
+                        ]);
+                    }
+                }
+
+                return $product;
+            });
+        } catch (Throwable $exception) {
+            Storage::disk($disk)->delete($paths);
+            throw $exception;
+        }
 
         return to_route('admin.products.edit', $product)
             ->with('toast', ['type' => 'success', 'message' => 'Product created.']);

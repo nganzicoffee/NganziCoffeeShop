@@ -147,11 +147,6 @@ export default function ShopIndex() {
                                 Coffee for every{' '}
                                 <span className="script-accent">ritual.</span>
                             </h2>
-                            <p className="mt-2 text-muted">
-                                Select a pack size and click &ldquo;Add to
-                                cart&rdquo; to place your order directly through
-                                our store. No login or password required.
-                            </p>
                         </div>
 
                         {cartCount > 0 && (
@@ -173,7 +168,7 @@ export default function ShopIndex() {
                     </div>
 
                     {/* Filters & Search Bar */}
-                    <div className="mb-10 flex flex-col gap-4 border-b border-border pb-6 md:flex-row md:items-center md:justify-between">
+                    <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <nav
                             className="flex flex-wrap gap-2"
                             aria-label="Filter by category"

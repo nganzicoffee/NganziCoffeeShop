@@ -18,9 +18,11 @@ export default defineConfig({
             presets: [reactCompilerPreset()],
         }),
         tailwindcss(),
-        wayfinder({
-            formVariants: true,
-        }),
+        // Use server-generated helpers when local PHP dependencies are unavailable.
+        process.env.SKIP_WAYFINDER !== '1' &&
+            wayfinder({
+                formVariants: true,
+            }),
     ]),
     server: {
         watch: {

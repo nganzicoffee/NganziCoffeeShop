@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\StaffRole;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\StaffInvitation;
 use App\Models\User;
+use App\Services\StaffInvitationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -41,6 +44,15 @@ class StaffController extends Controller
             ]);
 
         return Inertia::render('admin/staff', [
+            'invitations' => StaffInvitation::query()->whereNull('accepted_at')->whereNull('revoked_at')
+                ->latest()->get()->map(fn (StaffInvitation $invitation): array => [
+                    'id' => $invitation->id,
+                    'name' => $invitation->name,
+                    'email' => $invitation->email,
+                    'roleLabel' => $invitation->role->label(),
+                    'status' => $invitation->sent_at === null ? 'Not sent' : ($invitation->isUsable() ? 'Pending' : 'Expired / locked'),
+                    'expiresAt' => $invitation->expires_at->toIso8601String(),
+                ]),
             'users' => $users,
             'search' => $request->string('search')->toString(),
             'roles' => collect(StaffRole::cases())->map(fn (StaffRole $role) => [
@@ -48,6 +60,58 @@ class StaffController extends Controller
                 'label' => $role->label(),
             ]),
         ]);
+    }
+
+    public function invite(Request $request, StaffInvitationService $service): RedirectResponse
+    {
+        abort_unless($request->user()->hasRole(StaffRole::Owner), 403);
+        $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email', Rule::unique('staff_invitations', 'email')->whereNull('revoked_at')],
+            'role' => ['required', Rule::enum(StaffRole::class)],
+        ]);
+        $invitation = StaffInvitation::updateOrCreate(['email' => $data['email']], [
+            ...$data,
+            'invited_by' => $request->user()->id,
+            'token' => Str::random(64),
+            'code_hash' => bcrypt(Str::random(64)),
+            'expires_at' => now(),
+            'sent_at' => null,
+            'attempts' => 0,
+            'revoked_at' => null,
+            'accepted_at' => null,
+        ]);
+        $service->send($invitation, $request->user());
+
+        return back()->with('toast', ['type' => 'success', 'message' => 'Staff invitation emailed.']);
+    }
+
+    public function resendInvitation(Request $request, StaffInvitation $invitation, StaffInvitationService $service): RedirectResponse
+    {
+        abort_unless($request->user()->hasRole(StaffRole::Owner), 403);
+        $service->send($invitation, $request->user());
+
+        return back()->with('toast', ['type' => 'success', 'message' => 'A new invitation code has been emailed.']);
+    }
+
+    public function revokeInvitation(Request $request, StaffInvitation $invitation): RedirectResponse
+    {
+        abort_unless($request->user()->hasRole(StaffRole::Owner), 403);
+        DB::transaction(function () use ($invitation, $request): void {
+            $locked = StaffInvitation::query()->whereKey($invitation->id)->lockForUpdate()->firstOrFail();
+            abort_if($locked->accepted_at !== null, 422, 'This invitation was already accepted.');
+            $locked->update(['revoked_at' => now()]);
+            AuditLog::create([
+                'actor_id' => $request->user()->id,
+                'event' => 'staff.invitation_revoked',
+                'subject_type' => StaffInvitation::class,
+                'subject_id' => $locked->id,
+                'details' => ['email' => $locked->email],
+            ]);
+        });
+
+        return back()->with('toast', ['type' => 'success', 'message' => 'Invitation cancelled.']);
     }
 
     public function updateRole(Request $request, User $user): RedirectResponse

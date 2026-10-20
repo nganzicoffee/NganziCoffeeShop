@@ -30,12 +30,12 @@ export default function ProductCreate({ categories, statuses }: Props) {
                         New Product
                     </h1>
                     <p className="mt-1 text-xs text-muted">
-                        Create the product details first, then add pack variants
-                        and images on the next screen.
+                        Add product details, pack sizes, prices, stock, and
+                        front/back images together.
                     </p>
                 </div>
 
-                <div className="max-w-2xl rounded-xl border border-border bg-white p-6">
+                <div className="max-w-4xl rounded-xl border border-border bg-white p-6">
                     <ProductForm
                         categories={categories}
                         statuses={statuses}

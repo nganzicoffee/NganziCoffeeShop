@@ -107,7 +107,14 @@ export default function ShopFooter() {
                     <Link href="/about">About Us</Link>
                     <Link href="/coffee">Coffee</Link>
                     <Link href="/shop">Shop</Link>
-                    <a href="tel:+256773211079">+256 773 211079</a>
+                    <a href="tel:+256786707449">+256 786 707449</a>
+                    <a
+                        href="https://wa.me/256786707449"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        WhatsApp orders
+                    </a>
                     <a href="mailto:nganzicoffeeug@gmail.com">
                         nganzicoffeeug@gmail.com
                     </a>

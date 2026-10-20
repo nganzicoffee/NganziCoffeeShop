@@ -650,7 +650,7 @@ function ImagePanel({ product }: { product: Product }) {
                 </p>
             ) : (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {product.images.map((img) => (
+                    {product.images.map((img, position) => (
                         <div
                             key={img.id}
                             className="group relative overflow-hidden rounded-lg border border-border bg-white"
@@ -660,6 +660,44 @@ function ImagePanel({ product }: { product: Product }) {
                                 alt={img.alt ?? product.name}
                                 className="aspect-square w-full object-cover"
                             />
+                            <div className="space-y-1 border-t border-border p-2 text-xs">
+                                <p className="font-semibold">
+                                    {position === 0
+                                        ? 'Front / normal image'
+                                        : position === 1
+                                          ? 'Back / hover image'
+                                          : 'Additional image'}
+                                </p>
+                                {position > 0 && (
+                                    <button
+                                        type="button"
+                                        className="underline"
+                                        onClick={() =>
+                                            router.post(
+                                                `/admin/products/${product.id}/images/reorder`,
+                                                {
+                                                    order: [
+                                                        img.id,
+                                                        ...product.images
+                                                            .filter(
+                                                                (image) =>
+                                                                    image.id !==
+                                                                    img.id,
+                                                            )
+                                                            .map(
+                                                                (image) =>
+                                                                    image.id,
+                                                            ),
+                                                    ],
+                                                },
+                                                { preserveScroll: true },
+                                            )
+                                        }
+                                    >
+                                        Use as front image
+                                    </button>
+                                )}
+                            </div>
                             <button
                                 type="button"
                                 className="absolute top-1.5 right-1.5 rounded bg-white/95 px-2 py-0.5 text-[11px] font-semibold text-rose-700 shadow-sm hover:bg-rose-50"
@@ -681,44 +719,56 @@ function ImagePanel({ product }: { product: Product }) {
                 </div>
             )}
 
-            <form
-                onSubmit={handleUpload}
-                className="space-y-3 border-t border-border pt-4"
-            >
-                <div>
-                    <label className="mb-1 block text-xs font-semibold text-brown">
-                        Upload Image (JPG, PNG, WebP — max 4MB)
-                    </label>
-                    <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        className="block w-full text-xs text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brown hover:file:border-orange"
-                        onChange={(e) =>
-                            setData('image', e.target.files?.[0] ?? null)
-                        }
-                    />
-                    {errors.image && (
-                        <p className="mt-1 text-xs text-red-600">
-                            {errors.image}
-                        </p>
-                    )}
-                </div>
-                <div>
-                    <input
-                        className="nganzi-input h-9 w-full text-xs"
-                        placeholder="Alt text description (optional)"
-                        value={data.alt}
-                        onChange={(e) => setData('alt', e.target.value)}
-                    />
-                </div>
-                <button
-                    type="submit"
-                    disabled={processing || !data.image}
-                    className="w-full rounded-lg bg-orange py-2 text-xs font-semibold text-white transition-colors hover:bg-orange-hover disabled:opacity-50"
+            <p className="text-xs text-muted">
+                The first image displays normally; the second appears when a
+                customer hovers or focuses the image. A single image stays
+                visible. Remove an image to replace it, or use “Use as front
+                image” to swap their order.
+            </p>
+            {product.images.length < 2 && (
+                <form
+                    onSubmit={handleUpload}
+                    className="space-y-3 border-t border-border pt-4"
                 >
-                    {processing ? 'Uploading…' : 'Upload Image'}
-                </button>
-            </form>
+                    <div>
+                        <label className="mb-1 block text-xs font-semibold text-brown">
+                            Upload{' '}
+                            {product.images.length === 0
+                                ? 'front / normal'
+                                : 'back / hover'}{' '}
+                            image (JPG, PNG, WebP — max 4MB)
+                        </label>
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            className="block w-full text-xs text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brown hover:file:border-orange"
+                            onChange={(e) =>
+                                setData('image', e.target.files?.[0] ?? null)
+                            }
+                        />
+                        {errors.image && (
+                            <p className="mt-1 text-xs text-red-600">
+                                {errors.image}
+                            </p>
+                        )}
+                    </div>
+                    <div>
+                        <input
+                            className="nganzi-input h-9 w-full text-xs"
+                            placeholder="Alt text description (optional)"
+                            value={data.alt}
+                            onChange={(e) => setData('alt', e.target.value)}
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        disabled={processing || !data.image}
+                        className="w-full rounded-lg bg-orange py-2 text-xs font-semibold text-white transition-colors hover:bg-orange-hover disabled:opacity-50"
+                    >
+                        {processing ? 'Uploading…' : 'Upload Image'}
+                    </button>
+                </form>
+            )}
         </div>
     );
 }

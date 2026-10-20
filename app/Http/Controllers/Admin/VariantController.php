@@ -7,13 +7,28 @@ use App\Http\Requests\Admin\StoreVariantRequest;
 use App\Http\Requests\Admin\UpdateVariantRequest;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\InventoryMovement;
+use App\Enums\InventoryReason;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 
 class VariantController extends Controller
 {
     public function store(StoreVariantRequest $request, Product $product): RedirectResponse
     {
-        $product->variants()->create($request->validated());
+        DB::transaction(function () use ($product, $request): void {
+            Product::query()->whereKey($product->id)->lockForUpdate()->firstOrFail();
+            $variant = $product->variants()->create($request->validated());
+            InventoryMovement::create([
+                'variant_id' => $variant->id,
+                'actor_id' => $request->user()->id,
+                'reason' => InventoryReason::InitialStock,
+                'delta' => $variant->stock,
+                'stock_before' => 0,
+                'stock_after' => $variant->stock,
+                'note' => 'Initial stock recorded when adding a pack size.',
+            ]);
+        });
 
         return back()->with('toast', ['type' => 'success', 'message' => 'Variant added.']);
     }

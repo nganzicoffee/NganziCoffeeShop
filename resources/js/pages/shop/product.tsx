@@ -1,7 +1,7 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import ShopLayout from '@/layouts/shop/ShopLayout';
 import ProductCard from '@/components/shop/ProductCard';
-import { formatPrice } from '@/lib/price';
+import ShopPrice from '@/components/shop/ShopPrice';
 import type { Product, ProductVariant, ShopSharedProps } from '@/types/shop';
 import { useState } from 'react';
 
@@ -47,7 +47,10 @@ export default function ProductShow() {
             ? {
                   '@type': 'Offer',
                   priceCurrency: currency,
-                  price: (selectedVariant.price_minor / 100).toFixed(0),
+                  price:
+                      currency === 'UGX'
+                          ? String(selectedVariant.price_minor)
+                          : (selectedVariant.price_minor / 100).toFixed(2),
                   availability: inStock
                       ? 'https://schema.org/InStock'
                       : 'https://schema.org/OutOfStock',
@@ -196,10 +199,10 @@ export default function ProductShow() {
                             {/* Price */}
                             {selectedVariant && (
                                 <p className="price mb-6 text-[1.4rem]">
-                                    {formatPrice(
-                                        selectedVariant.price_minor,
-                                        currency,
-                                    )}
+                                    <ShopPrice
+                                        amount={selectedVariant.price_minor}
+                                        currency={currency}
+                                    />
                                 </p>
                             )}
 

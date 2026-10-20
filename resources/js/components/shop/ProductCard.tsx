@@ -1,6 +1,6 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { formatPrice } from '@/lib/price';
+import { useShopCurrency } from '@/hooks/use-shop-currency';
 import type { Product, ProductVariant, ShopSharedProps } from '@/types';
 
 type Props = {
@@ -8,6 +8,7 @@ type Props = {
 };
 
 export default function ProductCard({ product }: Props) {
+    const { formatPrice, currency: displayCurrency } = useShopCurrency();
     const { shop } = usePage<{ props: ShopSharedProps }>()
         .props as unknown as ShopSharedProps;
     const currency = shop?.currency ?? 'UGX';
@@ -30,6 +31,7 @@ export default function ProductCard({ product }: Props) {
         ? currentVariant.stock > 0
         : false;
     const image = product.images?.[0];
+    const hoverImage = product.images?.[1];
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -48,21 +50,38 @@ export default function ProductCard({ product }: Props) {
     };
 
     return (
-        <article className="shop-roast-card flex flex-col justify-between">
+        <article className="shop-roast-card flex flex-col">
             <div>
                 <Link
                     href={`/shop/${product.slug}`}
-                    className="shop-roast-image group block"
+                    className={`shop-roast-image group block ${hoverImage ? 'has-hover-image' : ''}`}
                     aria-label={`View ${product.name}`}
                 >
                     {image ? (
-                        <img
-                            src={`/storage/${image.path}`}
-                            alt={image.alt ?? product.name}
-                            loading="lazy"
-                        />
+                        <>
+                            <img
+                                src={image.url ?? `/storage/${image.path}`}
+                                alt={image.alt ?? product.name}
+                                loading="lazy"
+                                className="product-front-image"
+                            />
+                            {hoverImage && (
+                                <img
+                                    src={
+                                        hoverImage.url ??
+                                        `/storage/${hoverImage.path}`
+                                    }
+                                    alt={
+                                        hoverImage.alt ??
+                                        `${product.name} — back`
+                                    }
+                                    loading="lazy"
+                                    className="product-hover-image"
+                                />
+                            )}
+                        </>
                     ) : (
-                        <div className="flex h-[320px] w-full items-center justify-center bg-cream">
+                        <div className="flex h-full w-full items-center justify-center bg-cream">
                             <span className="text-xs text-muted">No image</span>
                         </div>
                     )}
@@ -77,11 +96,16 @@ export default function ProductCard({ product }: Props) {
                             {product.name}
                         </Link>
                     </h3>
+                    {product.description && (
+                        <p className="product-card-description text-sm text-muted">
+                            {product.description}
+                        </p>
+                    )}
 
                     {/* Variant pack size options */}
                     {activeVariants.length > 0 && (
-                        <div className="mt-3 mb-4">
-                            <p className="mb-2 text-xs font-semibold tracking-wider text-muted uppercase">
+                        <div className="my-2">
+                            <p className="mb-1 text-xs font-semibold tracking-wider text-muted uppercase">
                                 Select Size
                             </p>
                             <div className="flex flex-wrap gap-1.5">
@@ -94,6 +118,7 @@ export default function ProductCard({ product }: Props) {
                                             key={v.id}
                                             type="button"
                                             disabled={outOfStock}
+                                            aria-pressed={selected}
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 e.stopPropagation();
@@ -115,7 +140,7 @@ export default function ProductCard({ product }: Props) {
                         </div>
                     )}
 
-                    <div className="flex items-center justify-between border-t border-border/70 pt-3">
+                    <div className="flex items-center justify-between">
                         <span className="price text-[1.15rem]">
                             {currentPrice !== null
                                 ? formatPrice(currentPrice, currency)
@@ -127,16 +152,36 @@ export default function ProductCard({ product }: Props) {
                             </span>
                         )}
                     </div>
+                    {currentVariant && (
+                        <p className="mt-1 text-xs text-muted">
+                            {currentVariant.label} per pack ·{' '}
+                            {currentVariant.stock > 0
+                                ? `${currentVariant.stock} packs in stock`
+                                : 'Out of stock'}
+                        </p>
+                    )}
+                    {displayCurrency === 'USD' && (
+                        <p className="mt-1 text-xs text-muted">
+                            Estimated USD price · checkout in UGX
+                        </p>
+                    )}
                 </div>
             </div>
 
-            <div className="border-t border-border/80 p-4 pt-3">
+            <div className="px-5 pt-0 pb-5">
+                <a
+                    href="tel:+256786707449"
+                    className="text-link mb-3 inline-flex items-center gap-3 border-b border-orange pb-1 text-sm"
+                    aria-label={`Call +256 786 707449 to order ${product.name}`}
+                >
+                    Call to order <span aria-hidden="true">→</span>
+                </a>
                 <div className="flex items-center gap-2">
                     <button
                         type="button"
                         disabled={!currentVariantInStock || isAdding}
                         onClick={handleAddToCart}
-                        className="button button-dark !min-h-[46px] w-full !gap-2 rounded-none !py-2.5 !text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                        className="button button-dark !min-h-[40px] min-w-0 flex-1 !gap-2 rounded-none !px-3 !py-2 !text-sm whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {isAdding
                             ? 'Adding…'
@@ -154,7 +199,7 @@ export default function ProductCard({ product }: Props) {
                     </button>
                     <Link
                         href={`/shop/${product.slug}`}
-                        className="inline-flex h-[46px] shrink-0 items-center justify-center rounded-none border border-border px-3.5 text-xs font-bold text-brown transition-colors hover:border-orange hover:bg-peach"
+                        className="inline-flex h-[40px] shrink-0 items-center justify-center rounded-none border border-border px-3 text-xs font-bold text-brown transition-colors hover:border-orange hover:bg-peach"
                         aria-label={`View details for ${product.name}`}
                     >
                         Details

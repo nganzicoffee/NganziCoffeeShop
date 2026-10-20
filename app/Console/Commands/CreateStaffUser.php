@@ -84,7 +84,8 @@ class CreateStaffUser extends Command
             return self::FAILURE;
         }
 
-        $user = User::create([
+        // This trusted CLI command provisions verified staff accounts.
+        $user = User::forceCreate([
             'name' => trim($name),
             'email' => $email,
             'role' => $role,

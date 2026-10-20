@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import ShopLayout from '@/layouts/shop/ShopLayout';
-import { formatPrice } from '@/lib/price';
+import ShopPrice from '@/components/shop/ShopPrice';
+import { formatPrice as formatBasePrice } from '@/lib/price';
 
 type OrderConfirmationProps = {
     order: {
@@ -80,10 +81,10 @@ export default function OrderConfirmation() {
                                         × {item.quantity}
                                     </span>
                                     <span className="shrink-0 font-medium text-brown">
-                                        {formatPrice(
-                                            item.lineTotal,
-                                            order.currency,
-                                        )}
+                                        <ShopPrice
+                                            amount={item.lineTotal}
+                                            currency={order.currency}
+                                        />
                                     </span>
                                 </div>
                             ))}
@@ -109,10 +110,18 @@ export default function OrderConfirmation() {
                             <div className="flex justify-between border-t border-border pt-3 text-base font-semibold text-brown">
                                 <span>Total</span>
                                 <span>
-                                    {formatPrice(order.total, order.currency)}
+                                    <ShopPrice
+                                        amount={order.total}
+                                        currency={order.currency}
+                                    />
                                 </span>
                             </div>
                         </div>
+                        <p className="mt-4 text-sm text-muted">
+                            Recorded order total:{' '}
+                            {formatBasePrice(order.total, order.currency)}. USD
+                            displays are estimates.
+                        </p>
                         <Link
                             href="/shop"
                             className="button button-dark mt-8 w-full justify-center rounded-none sm:w-auto"
@@ -146,7 +155,9 @@ function SummaryLine({
     return (
         <div className="flex justify-between text-muted">
             <span>{label}</span>
-            <span>{formatPrice(amount, currency)}</span>
+            <span>
+                <ShopPrice amount={amount} currency={currency} />
+            </span>
         </div>
     );
 }

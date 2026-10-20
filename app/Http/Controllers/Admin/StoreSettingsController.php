@@ -23,6 +23,7 @@ class StoreSettingsController extends Controller
         return Inertia::render('admin/settings', [
             'currency' => config('shop.currency'),
             'settings' => [
+                'usd_exchange_rate' => $settings->usdExchangeRate(),
                 'delivery_fee' => $settings->integer('delivery_flat_fee', (int) config('shop.delivery.flat_fee', 0)),
                 'free_delivery_above' => $settings->integer('free_delivery_above', (int) config('shop.delivery.free_above', 0)),
                 'delivery_areas' => implode(', ', $settings->areas(config('shop.delivery.areas', []))),
@@ -38,6 +39,7 @@ class StoreSettingsController extends Controller
     {
         abort_unless($request->user()->hasRole(StaffRole::Owner), 403);
         $data = $request->validate([
+            'usd_exchange_rate' => ['sometimes', 'numeric', 'between:0,1000000'],
             'delivery_fee' => ['required', 'integer', 'min:0'],
             'free_delivery_above' => ['required', 'integer', 'min:0'],
             'delivery_areas' => ['nullable', 'string', 'max:1000'],
@@ -63,6 +65,9 @@ class StoreSettingsController extends Controller
             'tax_rate' => (string) $data['tax_rate'],
             'tax_inclusive' => $data['tax_inclusive'] ? 'true' : 'false',
         ];
+        if (array_key_exists('usd_exchange_rate', $data)) {
+            $values['usd_exchange_rate'] = (string) $data['usd_exchange_rate'];
+        }
 
         DB::transaction(function () use ($values, $request): void {
             $before = StoreSetting::query()->whereIn('key', array_keys($values))->pluck('value', 'key')->all();

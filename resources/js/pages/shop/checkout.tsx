@@ -2,7 +2,8 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import ShopLayout from '@/layouts/shop/ShopLayout';
-import { formatPrice } from '@/lib/price';
+import ShopPrice from '@/components/shop/ShopPrice';
+import { formatPrice as formatBasePrice } from '@/lib/price';
 import type { CartSummary } from '@/types/shop';
 
 type CheckoutProps = {
@@ -363,10 +364,10 @@ export default function Checkout() {
                                                 {item.quantity}
                                             </span>
                                             <span className="shrink-0 font-medium text-brown">
-                                                {formatPrice(
-                                                    item.line_total,
-                                                    currency,
-                                                )}
+                                                <ShopPrice
+                                                    amount={item.line_total}
+                                                    currency={currency}
+                                                />
                                             </span>
                                         </div>
                                     ))}
@@ -392,13 +393,22 @@ export default function Checkout() {
                                     <div className="flex justify-between border-t border-border pt-3 text-base font-semibold text-brown">
                                         <span>Total</span>
                                         <span>
-                                            {formatPrice(
-                                                quote.total_minor,
-                                                currency,
-                                            )}
+                                            <ShopPrice
+                                                amount={quote.total_minor}
+                                                currency={currency}
+                                            />
                                         </span>
                                     </div>
                                 </div>
+                                <p className="mt-4 text-sm font-semibold text-brown">
+                                    Order amount:{' '}
+                                    {formatBasePrice(
+                                        quote.total_minor,
+                                        currency,
+                                    )}
+                                    . USD displays are estimates; this order is
+                                    recorded and payable in {currency}.
+                                </p>
                                 <p className="mt-4 text-xs leading-relaxed text-muted">
                                     Prices and stock are verified at order
                                     placement. Payment will be coordinated
@@ -448,7 +458,9 @@ function SummaryLine({
     return (
         <div className="flex justify-between text-muted">
             <span>{label}</span>
-            <span>{formatPrice(amount, currency)}</span>
+            <span>
+                <ShopPrice amount={amount} currency={currency} />
+            </span>
         </div>
     );
 }

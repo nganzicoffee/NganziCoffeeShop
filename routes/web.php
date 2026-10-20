@@ -18,10 +18,14 @@ use App\Http\Controllers\Shop\ShopController;
 use App\Http\Controllers\Shop\SitemapController;
 use App\Http\Controllers\Shop\StaticPageController;
 use App\Http\Middleware\EnsureStaff;
+use App\Http\Controllers\StaffInvitationController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // ── Public shop ────────────────────────────────────────────────────
 Route::get('/', [ShopController::class, 'home'])->name('home');
+Route::get('/staff-invitations/{token}', [StaffInvitationController::class, 'show'])->where('token', '[A-Za-z0-9]{64}')->middleware('throttle:30,1')->name('staff-invitations.show');
+Route::post('/staff-invitations/{token}', [StaffInvitationController::class, 'store'])->where('token', '[A-Za-z0-9]{64}')->middleware('throttle:10,1')->name('staff-invitations.accept');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{slug}', [ShopProductController::class, 'show'])->name('shop.product');
@@ -50,7 +54,9 @@ if (app()->environment('local')) {
 
 // ── Authenticated ──────────────────────────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', function (Request $request) {
+        return redirect()->route($request->user()->isStaff() ? 'admin.dashboard' : 'home');
+    })->name('dashboard');
 
     Route::prefix('admin')->name('admin.')->middleware(EnsureStaff::class)->group(function () {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
@@ -65,6 +71,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('settings', [StoreSettingsController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [StoreSettingsController::class, 'update'])->name('settings.update');
         Route::get('staff', [StaffController::class, 'index'])->name('staff.index');
+        Route::post('staff/invitations', [StaffController::class, 'invite'])->middleware('throttle:10,1')->name('staff.invite');
+        Route::post('staff/invitations/{invitation}/resend', [StaffController::class, 'resendInvitation'])->middleware('throttle:10,1')->name('staff.invitations.resend');
+        Route::delete('staff/invitations/{invitation}', [StaffController::class, 'revokeInvitation'])->name('staff.invitations.revoke');
         Route::patch('staff/{user}/role', [StaffController::class, 'updateRole'])->name('staff.role.update');
         Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 

@@ -10,11 +10,16 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ProductImageController extends Controller
 {
     public function store(StoreImageRequest $request, Product $product): RedirectResponse
     {
+        if ($product->images()->count() >= 2) {
+            throw ValidationException::withMessages(['image' => 'Use up to two product images. Remove an image before uploading its replacement.']);
+        }
         $disk = config('shop.media_disk');
         $file = $request->file('image');
         $path = $file->storeAs(
@@ -23,13 +28,26 @@ class ProductImageController extends Controller
             $disk,
         );
 
-        $nextOrder = $product->images()->max('sort_order') + 1;
+        if ($path === false) {
+            throw ValidationException::withMessages(['image' => 'The image could not be saved. Check product image storage.']);
+        }
 
-        $product->images()->create([
-            'path' => $path,
-            'alt' => $request->input('alt', $product->name),
-            'sort_order' => $nextOrder,
-        ]);
+        try {
+            DB::transaction(function () use ($product, $path, $request): void {
+                Product::query()->whereKey($product->id)->lockForUpdate()->firstOrFail();
+                if ($product->images()->count() >= 2) {
+                    throw ValidationException::withMessages(['image' => 'Both image positions are already filled.']);
+                }
+                $product->images()->create([
+                    'path' => $path,
+                    'alt' => $request->input('alt', $product->name),
+                    'sort_order' => (int) $product->images()->max('sort_order') + 1,
+                ]);
+            });
+        } catch (\Throwable $exception) {
+            Storage::disk($disk)->delete($path);
+            throw $exception;
+        }
 
         return back()->with('toast', ['type' => 'success', 'message' => 'Image uploaded.']);
     }
@@ -51,12 +69,22 @@ class ProductImageController extends Controller
 
         $request->validate([
             'order' => ['required', 'array'],
-            'order.*' => ['integer', 'exists:product_images,id'],
+            'order.*' => ['integer', 'distinct', 'exists:product_images,id'],
         ]);
 
-        foreach ($request->input('order') as $position => $imageId) {
-            $product->images()->where('id', $imageId)->update(['sort_order' => $position]);
-        }
+        DB::transaction(function () use ($request, $product): void {
+            Product::query()->whereKey($product->id)->lockForUpdate()->firstOrFail();
+            $current = $product->images()->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
+            $requested = array_map(intval(...), $request->input('order'));
+            $sorted = $requested;
+            sort($sorted);
+            if ($sorted !== $current) {
+                throw ValidationException::withMessages(['order' => 'Include every image belonging to this product exactly once.']);
+            }
+            foreach ($requested as $position => $imageId) {
+                $product->images()->where('id', $imageId)->update(['sort_order' => $position]);
+            }
+        });
 
         return back();
     }

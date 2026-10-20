@@ -33,14 +33,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          extensions: pdo, pdo_mysql, mbstring, xml, curl
+          extensions: pdo, pdo_mysql, mbstring, xml, curl, bcmath, fileinfo, gd, zip
           tools: composer:v2
           coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Create Test Database
         run: |
@@ -51,3 +51,6 @@ jobs:
 
       - name: Run CI Checks
         run: composer ci:check
+
+      - name: Verify storefront currency calculations
+        run: node --test tests/frontend/price.test.mjs

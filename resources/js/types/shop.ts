@@ -8,7 +8,7 @@ import type {
 export type { Category, Product, ProductVariant, PaginatedProducts };
 
 export type ShopSharedProps = {
-    shop: { currency: string };
+    shop: { currency: string; usdExchangeRate?: number };
     cartCount: number;
     flash: { toast?: { type: string; message: string } | null };
 };

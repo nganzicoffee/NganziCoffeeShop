@@ -33,3 +33,21 @@ export function formatPrice(minorUnits: number, currency: string): string {
         return `${currency} ${amount.toLocaleString()}`;
     }
 }
+
+/** Display-only conversion. Cart and order amounts stay in their stored currency. */
+export function formatDisplayPrice(
+    minorUnits: number,
+    sourceCurrency: string,
+    displayCurrency: string,
+    ugxPerUsd: number,
+): string {
+    if (
+        sourceCurrency === 'UGX' &&
+        displayCurrency === 'USD' &&
+        Number.isFinite(ugxPerUsd) &&
+        ugxPerUsd > 0
+    ) {
+        return `≈ ${formatPrice(Math.round((minorUnits / ugxPerUsd) * 100), 'USD')}`;
+    }
+    return formatPrice(minorUnits, sourceCurrency);
+}

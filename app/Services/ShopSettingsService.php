@@ -6,6 +6,11 @@ use App\Models\StoreSetting;
 
 class ShopSettingsService
 {
+    public function usdExchangeRate(): float
+    {
+        return max(0, $this->decimal('usd_exchange_rate', 0));
+    }
+
     public function deliveryFee(int $subtotal): int
     {
         $freeAbove = $this->integer('free_delivery_above', (int) config('shop.delivery.free_above', 0));

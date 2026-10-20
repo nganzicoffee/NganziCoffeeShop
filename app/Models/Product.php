@@ -57,7 +57,7 @@ class Product extends Model
     /** @return HasMany<ProductImage, $this> */
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');
     }
 
     /** @param Builder<Product> $query */

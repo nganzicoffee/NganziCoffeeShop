@@ -9,13 +9,13 @@ This repository is the unified full application providing brand pages, coffee ca
 
 ## Prerequisites
 
-| Tool       | Minimum version   |
-| ---------- | ----------------- |
-| PHP        | 8.3               |
-| Composer   | 2                 |
-| Node       | 22                |
-| npm / pnpm | bundled with Node |
-| MySQL      | 8.0+              |
+| Tool       | Minimum version                  |
+| ---------- | -------------------------------- |
+| PHP        | 8.5 (locked dependencies and CI) |
+| Composer   | 2                                |
+| Node       | 24                               |
+| npm / pnpm | bundled with Node                |
+| MySQL      | 8.0+                             |
 
 Required PHP extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`,
 `xml`, `ctype`, `json`, `bcmath`, `fileinfo`, `gd` or `imagick`.
@@ -26,7 +26,7 @@ Required PHP extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`,
 
 ```bash
 # 1. Clone and enter the project
-git clone <repo-url> NganziCoffeeShop
+git clone https://github.com/nganzicoffee/NganziCoffeeShop.git
 cd NganziCoffeeShop
 
 # 2. Install PHP dependencies
@@ -51,7 +51,7 @@ php artisan db:seed
 php artisan storage:link
 
 # 8. Install Node dependencies
-npm install
+npm ci
 
 # 9. Build frontend assets
 npm run build
@@ -164,7 +164,11 @@ inventory reservation has expired.
 
 ## Production deployment checklist (summary)
 
-Full instructions are in Prompt 14 of the development plan. Key points:
+Current hosting instructions and the collaborator handoff are in
+[deployment/SPACESHIP.md](deployment/SPACESHIP.md). The existing root `deploy.sh`
+and Ubuntu guide are legacy VPS examples; do not run them on Spaceship.
+Automatic deployment is paused until the Spaceship workflow is configured.
+General requirements:
 
 - Set `APP_ENV=production`, `APP_DEBUG=false`.
 - Run `php artisan config:cache`, `route:cache`, `view:cache` after deploy.
@@ -178,17 +182,40 @@ Full instructions are in Prompt 14 of the development plan. Key points:
 
 ---
 
-## Unconfirmed business decisions
+## Working on the website
 
-The following must be confirmed before the relevant features can go live.
-See the audit report (Prompt 1) for the full list.
+Keep the existing Laravel / Inertia / React structure:
 
-- Currency (`SHOP_CURRENCY`)
+| Location                                  | Purpose                                   |
+| ----------------------------------------- | ----------------------------------------- |
+| `resources/js/pages/shop/`                | Public pages, story, contact and checkout |
+| `resources/js/components/shop/`           | Shared header, footer and product cards   |
+| `resources/js/pages/admin/`               | Staff administration screens              |
+| `resources/css/site.css`                  | Storefront styling                        |
+| `public/assets/`                          | Versioned brand and editorial images      |
+| `app/`, `routes/`, `database/migrations/` | Backend behavior and schema               |
+| `tests/`                                  | Backend and frontend checks               |
+
+Product photos uploaded in Admin, stock, orders and staff accounts are stored
+on hosting, not in Git. Add story/brand images to `public/assets/` and reference
+them from the page source; manage catalogue images through Admin.
+
+Implemented updates include staff email invitations, the staff dashboard redirect,
+pack prices and stock at product creation, two-image hover cards, owner-set USD
+display conversion, compact forms/cards, and the updated order phone/WhatsApp.
+See [staff invitations](deployment/STAFF_INVITATIONS.md) and
+[catalogue details](deployment/PRODUCT_CATALOGUE.md).
+Customer account creation at checkout and Google sign-in are planned, not implemented.
+
+## Business configuration
+
+UGX is the base currency; USD estimates use an owner-entered exchange rate.
+Spaceship hosts the app, and Resend SMTP sends transactional email.
+Review the following business settings before enabling the relevant features:
+
 - Payment provider and credentials
 - Delivery areas, zones, and fees
 - Tax applicability and rate
 - Final product catalogue (names, variants, prices, stock)
-- Hosting provider and production database engine
-- Email sender and transactional mail provider
 - Staff roles required
 - Returns and refunds policy

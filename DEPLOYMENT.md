@@ -1,5 +1,10 @@
 # Nganzi Coffee — Production Deployment Guide
 
+> The live website runs on Spaceship shared hosting. Start with
+> [deployment/SPACESHIP.md](deployment/SPACESHIP.md).
+> The Ubuntu/Nginx instructions below and root `deploy.sh` are legacy VPS
+> examples, not the deployment procedure for the current website.
+
 This guide details the complete deployment procedure for **`nganzicoffee.com`** (the unified Laravel + Inertia + React website, storefront, and staff dashboard).
 
 ---

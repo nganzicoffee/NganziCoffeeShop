@@ -1,11 +1,8 @@
-name: deploy
+name: Legacy Ubuntu deployment (manual only)
 
 on:
-  workflow_run:
-    workflows: ["tests"]
-    branches: [main]
-    types:
-      - completed
+  # Spaceship uses a separate public directory and PHP binary. Keep automatic
+  # deployment off until its workflow and dedicated credentials are configured.
   workflow_dispatch:
 
 permissions:
@@ -14,7 +11,6 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success') }}
 
     steps:
       - name: Check if Deployment Secrets are configured

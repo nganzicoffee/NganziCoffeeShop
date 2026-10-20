@@ -1,7 +1,9 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
+import { useShopCurrency } from '@/hooks/use-shop-currency';
 
 export default function ShopHeader() {
+    const display = useShopCurrency();
     const [open, setOpen] = useState(false);
     const { cartCount } = usePage<{ cartCount?: number }>().props;
     const toggleRef = useRef<HTMLButtonElement>(null);
@@ -127,6 +129,27 @@ export default function ShopHeader() {
                     <Link href="/contact" onClick={() => setOpen(false)}>
                         Contact
                     </Link>
+                    <label className="flex items-center gap-1 text-xs text-brown">
+                        <span className="sr-only">Display currency</span>
+                        <select
+                            aria-label="Display currency"
+                            title={
+                                display.canShowUsd
+                                    ? 'USD prices are estimates. Checkout is in UGX.'
+                                    : 'USD display becomes available when the owner sets an exchange rate.'
+                            }
+                            className="border-0 bg-transparent py-2 text-xs"
+                            value={display.currency}
+                            onChange={(event) =>
+                                display.setCurrency(event.target.value)
+                            }
+                        >
+                            <option value="UGX">UGX</option>
+                            <option value="USD" disabled={!display.canShowUsd}>
+                                USD
+                            </option>
+                        </select>
+                    </label>
                     <Link
                         href="/cart"
                         onClick={() => setOpen(false)}

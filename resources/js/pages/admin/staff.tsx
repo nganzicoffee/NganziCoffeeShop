@@ -1,4 +1,5 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
+import InputError from '@/components/input-error';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import type { BreadcrumbItem } from '@/types';
@@ -13,6 +14,14 @@ type UserItem = {
 };
 
 type Props = {
+    invitations: Array<{
+        id: number;
+        name: string;
+        email: string;
+        roleLabel: string;
+        status: string;
+        expiresAt: string;
+    }>;
     users: {
         data: UserItem[];
         links: Array<{ url: string | null; label: string; active: boolean }>;
@@ -32,7 +41,12 @@ export default function StaffIndex({
     users,
     search: initialSearch,
     roles,
+    invitations,
 }: Props) {
+    const invite = useForm({ name: '', email: '', role: 'order_manager' });
+    const { errors } = usePage().props;
+    const [notice, setNotice] = useState('');
+    const [invitationBusy, setInvitationBusy] = useState<number | null>(null);
     const [search, setSearch] = useState(initialSearch ?? '');
     const [updatingId, setUpdatingId] = useState<number | null>(null);
 
@@ -78,6 +92,179 @@ export default function StaffIndex({
                         Manage staff accounts and role permissions.
                     </p>
                 </div>
+
+                <form
+                    className="space-y-4 rounded-xl border border-border p-5"
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        setNotice('');
+                        invite.post('/admin/staff/invitations', {
+                            preserveScroll: true,
+                            onSuccess: () => {
+                                invite.reset('name', 'email');
+                                setNotice(
+                                    'Invitation emailed. The recipient can use their code to choose a password.',
+                                );
+                            },
+                        });
+                    }}
+                >
+                    <h2 className="font-semibold text-brown">
+                        Invite a staff member
+                    </h2>
+                    <p className="text-sm text-muted">
+                        Email a one-time code and a link to set their password.
+                        Invitations expire after 30 minutes.
+                    </p>
+                    <div className="grid gap-4 md:grid-cols-3">
+                        <label className="grid gap-2 text-sm">
+                            Full name
+                            <input
+                                className="nganzi-input w-full"
+                                required
+                                maxLength={255}
+                                autoComplete="name"
+                                value={invite.data.name}
+                                onChange={(event) =>
+                                    invite.setData('name', event.target.value)
+                                }
+                            />
+                            <InputError message={invite.errors.name} />
+                        </label>
+                        <label className="grid gap-2 text-sm">
+                            Email address
+                            <input
+                                className="nganzi-input w-full"
+                                required
+                                type="email"
+                                maxLength={255}
+                                autoComplete="email"
+                                value={invite.data.email}
+                                onChange={(event) =>
+                                    invite.setData('email', event.target.value)
+                                }
+                            />
+                            <InputError message={invite.errors.email} />
+                        </label>
+                        <label className="grid gap-2 text-sm">
+                            Staff role
+                            <select
+                                className="nganzi-input w-full"
+                                value={invite.data.role}
+                                onChange={(event) =>
+                                    invite.setData('role', event.target.value)
+                                }
+                            >
+                                {roles.map((role) => (
+                                    <option key={role.value} value={role.value}>
+                                        {role.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={invite.errors.role} />
+                        </label>
+                    </div>
+                    {invite.data.role === 'owner' && (
+                        <p className="text-sm text-brown">
+                            Owners have full access, including inviting other
+                            owners and managing staff roles.
+                        </p>
+                    )}
+                    <InputError message={errors.invitation} />
+                    {notice && (
+                        <p role="status" className="text-sm text-brown">
+                            {notice}
+                        </p>
+                    )}
+                    <button
+                        className="rounded-lg bg-orange px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                        disabled={invite.processing}
+                        type="submit"
+                    >
+                        {invite.processing ? 'Sending…' : 'Send invitation'}
+                    </button>
+                </form>
+
+                {invitations.length > 0 && (
+                    <section className="space-y-3 rounded-xl border border-border p-5">
+                        <h2 className="font-semibold text-brown">
+                            Pending invitations
+                        </h2>
+                        <p className="text-sm text-muted">
+                            Resending replaces the previous code and link. New
+                            staff appear below once they accept.
+                        </p>
+                        {invitations.map((invitation) => (
+                            <div
+                                key={invitation.id}
+                                className="flex flex-wrap items-center justify-between gap-3 border-t border-border py-3 text-sm"
+                            >
+                                <div>
+                                    <p className="font-semibold">
+                                        {invitation.name} ·{' '}
+                                        {invitation.roleLabel}
+                                    </p>
+                                    <p>{invitation.email}</p>
+                                    <p className="text-xs text-muted">
+                                        {invitation.status} · Expires{' '}
+                                        {new Date(
+                                            invitation.expiresAt,
+                                        ).toLocaleString()}
+                                    </p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        type="button"
+                                        className="underline disabled:opacity-50"
+                                        disabled={invitationBusy !== null}
+                                        onClick={() => {
+                                            setInvitationBusy(invitation.id);
+                                            router.post(
+                                                `/admin/staff/invitations/${invitation.id}/resend`,
+                                                {},
+                                                {
+                                                    preserveScroll: true,
+                                                    onSuccess: () =>
+                                                        setNotice(
+                                                            'A new invitation has been emailed.',
+                                                        ),
+                                                    onFinish: () =>
+                                                        setInvitationBusy(null),
+                                                },
+                                            );
+                                        }}
+                                    >
+                                        Resend code
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="underline disabled:opacity-50"
+                                        disabled={invitationBusy !== null}
+                                        onClick={() => {
+                                            if (
+                                                !window.confirm(
+                                                    `Cancel the invitation for ${invitation.email}?`,
+                                                )
+                                            )
+                                                return;
+                                            setInvitationBusy(invitation.id);
+                                            router.delete(
+                                                `/admin/staff/invitations/${invitation.id}`,
+                                                {
+                                                    preserveScroll: true,
+                                                    onFinish: () =>
+                                                        setInvitationBusy(null),
+                                                },
+                                            );
+                                        }}
+                                    >
+                                        Cancel invitation
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </section>
+                )}
 
                 {/* Search */}
                 <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-white p-3">

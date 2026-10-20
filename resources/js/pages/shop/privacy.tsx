@@ -75,7 +75,7 @@ export default function Privacy() {
                                 nganzicoffeeug@gmail.com
                             </a>{' '}
                             or call{' '}
-                            <a href="tel:+256773211079">+256 773 211079</a>.
+                            <a href="tel:+256786707449">+256 786 707449</a>.
                         </p>
                     </div>
                 </div>

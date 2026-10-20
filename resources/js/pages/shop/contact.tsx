@@ -52,8 +52,15 @@ export default function Contact() {
                                 >
                                     ☎
                                 </span>
-                                <a href="tel:+256773211079">
-                                    +256 (0) 773 211079
+                                <a href="tel:+256786707449">+256 786 707449</a>
+                            </li>
+                            <li>
+                                <a
+                                    href="https://wa.me/256786707449"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    WhatsApp: +256 786 707449
                                 </a>
                             </li>
                             <li>

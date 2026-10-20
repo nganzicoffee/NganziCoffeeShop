@@ -2,6 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import type { BreadcrumbItem } from '@/types';
 
 type SettingsData = {
+    usd_exchange_rate: number;
     delivery_fee: number;
     free_delivery_above: number;
     delivery_areas: string;
@@ -23,6 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function StoreSettings({ currency, settings }: Props) {
     const form = useForm<SettingsData>({
+        usd_exchange_rate: settings.usd_exchange_rate ?? 0,
         delivery_fee: settings.delivery_fee,
         free_delivery_above: settings.free_delivery_above,
         delivery_areas: settings.delivery_areas,
@@ -56,6 +58,43 @@ export default function StoreSettings({ currency, settings }: Props) {
                     className="max-w-2xl space-y-6 rounded-xl border border-border bg-white p-6"
                 >
                     {/* Delivery Section */}
+                    <section className="space-y-3">
+                        <h2 className="border-b border-border pb-2.5 text-sm font-bold text-brown">
+                            Currency display
+                        </h2>
+                        <label
+                            htmlFor="usd_exchange_rate"
+                            className="block text-xs font-semibold"
+                        >
+                            UGX per 1 USD
+                        </label>
+                        <input
+                            id="usd_exchange_rate"
+                            className="nganzi-input w-full"
+                            type="number"
+                            min="0"
+                            max="1000000"
+                            step="0.01"
+                            value={form.data.usd_exchange_rate}
+                            onChange={(event) =>
+                                form.setData(
+                                    'usd_exchange_rate',
+                                    Number(event.target.value),
+                                )
+                            }
+                        />
+                        <p className="text-xs text-muted">
+                            Enter your exchange rate to enable the visitor’s
+                            UGX/USD display selector. Enter 0 to disable USD.
+                            Catalogue prices, orders, and checkout remain in
+                            UGX; USD amounts are estimates.
+                        </p>
+                        {form.errors.usd_exchange_rate && (
+                            <p className="text-xs text-red-600">
+                                {form.errors.usd_exchange_rate}
+                            </p>
+                        )}
+                    </section>
                     <section className="space-y-4">
                         <h2 className="border-b border-border pb-2.5 text-sm font-bold text-brown">
                             Delivery

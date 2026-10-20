@@ -51,10 +51,10 @@ export default function Delivery() {
                     <p className="text-muted">
                         Phone:{' '}
                         <a
-                            href="tel:+256773211079"
+                            href="tel:+256786707449"
                             className="underline hover:text-orange-hover"
                         >
-                            +256 773 211079
+                            +256 786 707449
                         </a>
                         <br />
                         Email:{' '}

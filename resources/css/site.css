@@ -1921,7 +1921,11 @@
     }
 
     .shop-roasts .section-heading {
-        margin-bottom: 36px;
+        margin-bottom: 16px;
+    }
+
+    .shop-roasts > .container {
+        width: min(1200px, calc(100% - 48px));
     }
 
     .shop-roasts .section-heading h2 .script-accent {
@@ -1943,6 +1947,7 @@
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 28px;
+        align-items: start;
     }
 
     .shop-roast-card {
@@ -1952,8 +1957,9 @@
     }
 
     .shop-roast-image {
+        position: relative;
         display: grid;
-        min-height: 300px;
+        height: 240px;
         place-items: center;
         overflow: hidden;
         background: var(--cream);
@@ -1961,10 +1967,43 @@
 
     .shop-roast-image img {
         width: min(100%, 390px);
-        height: 320px;
+        height: 100%;
+        max-height: 240px;
         object-fit: contain;
         mix-blend-mode: multiply;
-        transition: transform 450ms ease;
+        transition:
+            transform 450ms ease,
+            opacity 250ms ease;
+    }
+
+    .shop-roast-image .product-hover-image {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    @media (hover: hover) {
+        .shop-roast-card:hover .has-hover-image .product-front-image {
+            opacity: 0;
+        }
+        .shop-roast-card:hover .has-hover-image .product-hover-image {
+            opacity: 1;
+        }
+    }
+
+    .shop-roast-image.has-hover-image:focus-visible .product-front-image {
+        opacity: 0;
+    }
+    .shop-roast-image.has-hover-image:focus-visible .product-hover-image {
+        opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .shop-roast-image img {
+            transition: none;
+        }
     }
 
     .shop-roast-card:hover .shop-roast-image img {
@@ -1972,7 +2011,7 @@
     }
 
     .shop-roast-copy {
-        padding: 26px;
+        padding: 18px 20px 12px;
     }
 
     .shop-roast-copy .eyebrow {
@@ -1981,16 +2020,25 @@
     }
 
     .shop-roast-copy h3 {
-        margin-bottom: 10px;
+        margin-bottom: 6px;
         color: var(--brown);
-        font-size: 1.65rem;
+        font-size: 1.4rem;
     }
 
     .shop-roast-copy > p:not(.eyebrow) {
-        min-height: 3.5em;
-        margin-bottom: 20px;
-        font-size: 0.98rem;
-        line-height: 1.65;
+        min-height: 0;
+        margin-bottom: 0;
+        font-size: 0.75rem;
+        line-height: 1.5;
+    }
+
+    .shop-roast-copy > .product-card-description {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        margin-bottom: 8px;
+        font-size: 0.875rem;
     }
 
     .shop-order-options {
@@ -2135,11 +2183,11 @@
         }
 
         .shop-roast-image {
-            min-height: 280px;
+            height: 240px;
         }
 
         .shop-roast-image img {
-            height: 300px;
+            height: 100%;
         }
 
         .shop-roast-copy > p:not(.eyebrow) {

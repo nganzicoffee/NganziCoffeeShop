@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'shop' => [
                 'currency' => config('shop.currency'),
+                'usdExchangeRate' => app(\App\Services\ShopSettingsService::class)->usdExchangeRate(),
             ],
             'cartCount' => fn () => app(CartService::class)->itemCount($request),
             'flash' => [

@@ -1,6 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import ShopLayout from '@/layouts/shop/ShopLayout';
-import { formatPrice } from '@/lib/price';
+import ShopPrice from '@/components/shop/ShopPrice';
 import type { CartSummary } from '@/types/shop';
 import { Trash2, Minus, Plus, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
@@ -107,10 +107,10 @@ export default function Cart() {
                                             )
                                         </span>
                                         <span className="font-semibold text-brown">
-                                            {formatPrice(
-                                                cart.subtotal,
-                                                currency,
-                                            )}
+                                            <ShopPrice
+                                                amount={cart.subtotal}
+                                                currency={currency}
+                                            />
                                         </span>
                                     </div>
                                     <div className="mb-3 flex justify-between text-sm text-muted">
@@ -120,10 +120,10 @@ export default function Cart() {
                                     <div className="mb-6 flex justify-between border-t border-border pt-3 font-semibold text-brown">
                                         <span>Total</span>
                                         <span>
-                                            {formatPrice(
-                                                cart.subtotal,
-                                                currency,
-                                            )}
+                                            <ShopPrice
+                                                amount={cart.subtotal}
+                                                currency={currency}
+                                            />
                                         </span>
                                     </div>
                                     <Link
@@ -226,7 +226,10 @@ function CartRow({
                     </Link>
                     <p className="text-sm text-muted">{item.variant_label}</p>
                     <p className="text-sm font-medium text-brown">
-                        {formatPrice(item.price_minor, currency)}
+                        <ShopPrice
+                            amount={item.price_minor}
+                            currency={currency}
+                        />
                     </p>
                 </div>
 
@@ -261,7 +264,10 @@ function CartRow({
 
                     {/* Line total */}
                     <span className="min-w-[80px] text-right text-sm font-semibold text-brown">
-                        {formatPrice(item.line_total, currency)}
+                        <ShopPrice
+                            amount={item.line_total}
+                            currency={currency}
+                        />
                     </span>
 
                     {/* Remove */}
