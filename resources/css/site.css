@@ -1943,10 +1943,13 @@
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 28px;
-        align-items: start;
+        align-items: stretch;
     }
 
     .shop-roast-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
         min-width: 0;
         border: 1px solid var(--border);
         background: var(--paper);
@@ -2007,6 +2010,9 @@
     }
 
     .shop-roast-copy {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
         padding: 18px 20px 12px;
     }
 
@@ -2016,6 +2022,11 @@
     }
 
     .shop-roast-copy h3 {
+        display: -webkit-box;
+        min-height: 3.05rem;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
         margin-bottom: 6px;
         color: var(--brown);
         font-size: 1.4rem;
@@ -2030,11 +2041,13 @@
 
     .shop-roast-copy > .product-card-description {
         display: -webkit-box;
+        min-height: 2.625rem;
         overflow: hidden;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
         margin-bottom: 8px;
         font-size: 0.875rem;
+        line-height: 1.5;
     }
 
     .shop-order-options {

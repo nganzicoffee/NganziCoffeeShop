@@ -50,11 +50,11 @@ export default function ProductCard({ product }: Props) {
     };
 
     return (
-        <article className="shop-roast-card flex flex-col">
-            <div>
+        <article className="shop-roast-card flex h-full flex-col">
+            <div className="flex flex-1 flex-col">
                 <Link
                     href={`/shop/${product.slug}`}
-                    className={`shop-roast-image group block ${hoverImage ? 'has-hover-image' : ''}`}
+                    className={`shop-roast-image group block shrink-0 ${hoverImage ? 'has-hover-image' : ''}`}
                     aria-label={`View ${product.name}`}
                 >
                     {image ? (
@@ -87,7 +87,7 @@ export default function ProductCard({ product }: Props) {
                     )}
                 </Link>
 
-                <div className="shop-roast-copy">
+                <div className="shop-roast-copy flex flex-1 flex-col">
                     <h3>
                         <Link
                             href={`/shop/${product.slug}`}
@@ -96,11 +96,9 @@ export default function ProductCard({ product }: Props) {
                             {product.name}
                         </Link>
                     </h3>
-                    {product.description && (
-                        <p className="product-card-description text-sm text-muted">
-                            {product.description}
-                        </p>
-                    )}
+                    <p className="product-card-description text-sm text-muted">
+                        {product.description || '\u00A0'}
+                    </p>
 
                     {/* Variant pack size options */}
                     {activeVariants.length > 0 && (
@@ -140,35 +138,37 @@ export default function ProductCard({ product }: Props) {
                         </div>
                     )}
 
-                    <div className="flex items-center justify-between">
-                        <span className="price text-[1.15rem]">
-                            {currentPrice !== null
-                                ? formatPrice(currentPrice, currency)
-                                : 'Price on request'}
-                        </span>
-                        {!inStock && (
-                            <span className="badge rounded-none text-[0.65rem] text-muted">
-                                Out of stock
+                    <div className="mt-auto pt-2">
+                        <div className="flex items-center justify-between">
+                            <span className="price text-[1.15rem]">
+                                {currentPrice !== null
+                                    ? formatPrice(currentPrice, currency)
+                                    : 'Price on request'}
                             </span>
+                            {!inStock && (
+                                <span className="badge rounded-none text-[0.65rem] text-muted">
+                                    Out of stock
+                                </span>
+                            )}
+                        </div>
+                        {currentVariant && (
+                            <p className="mt-1 text-xs text-muted">
+                                {currentVariant.label} per pack ·{' '}
+                                {currentVariant.stock > 0
+                                    ? `${currentVariant.stock} packs in stock`
+                                    : 'Out of stock'}
+                            </p>
+                        )}
+                        {displayCurrency === 'USD' && (
+                            <p className="mt-1 text-xs text-muted">
+                                Estimated USD price · checkout in UGX
+                            </p>
                         )}
                     </div>
-                    {currentVariant && (
-                        <p className="mt-1 text-xs text-muted">
-                            {currentVariant.label} per pack ·{' '}
-                            {currentVariant.stock > 0
-                                ? `${currentVariant.stock} packs in stock`
-                                : 'Out of stock'}
-                        </p>
-                    )}
-                    {displayCurrency === 'USD' && (
-                        <p className="mt-1 text-xs text-muted">
-                            Estimated USD price · checkout in UGX
-                        </p>
-                    )}
                 </div>
             </div>
 
-            <div className="px-5 pt-0 pb-5">
+            <div className="mt-auto px-5 pt-0 pb-5">
                 <a
                     href="tel:+256786707449"
                     className="text-link mb-3 inline-flex items-center gap-3 border-b border-orange pb-1 text-sm"
