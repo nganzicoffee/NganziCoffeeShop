@@ -133,7 +133,10 @@ export default function ShopFooter() {
             </div>
 
             <div className="footer-bottom container">
-                <p>© 2026 Nganzi Coffee. All rights reserved.</p>
+                <p>
+                    © 2026 Nganzi Coffee. All rights reserved. Fresh from
+                    Uganda.
+                </p>
                 <Link href="/policies/privacy-policy">Privacy Policy</Link>
             </div>
         </footer>
