@@ -1,36 +1,103 @@
-name: Legacy Ubuntu deployment (manual only)
+name: Spaceship deployment
 
 on:
-  # Spaceship uses a separate public directory and PHP binary. Keep automatic
-  # deployment off until its workflow and dedicated credentials are configured.
+  workflow_call:
+  # A direct run is a read-only connection test. tests.yml calls deployments.
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
+
+concurrency:
+  group: spaceship-production
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
     steps:
-      - name: Check if Deployment Secrets are configured
-        id: check_secrets
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Configure dedicated SSH access
+        env:
+          DEPLOY_HOST: ${{ secrets.SSH_HOST }}
+          DEPLOY_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_USER: ${{ secrets.SSH_USERNAME }}
+          DEPLOY_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        shell: bash
         run: |
-          if [ -z "${{ secrets.SSH_HOST }}" ] || [ -z "${{ secrets.SSH_KEY }}" ]; then
-            echo "configured=false" >> $GITHUB_OUTPUT
-            echo "Deployment secrets (SSH_HOST and SSH_KEY) are not set yet. Skipping automatic deployment."
+          set -euo pipefail
+          test "$DEPLOY_HOST" = '66.29.148.167' || { echo 'SSH_HOST must match Spaceship.'; exit 1; }
+          test "$DEPLOY_PORT" = '21098' || { echo 'SSH_PORT must be 21098.'; exit 1; }
+          test "$DEPLOY_USER" = 'qpcgrmbjuy' || { echo 'SSH_USERNAME must match the hosting account.'; exit 1; }
+          test -n "$DEPLOY_KEY" || { echo 'SSH_PRIVATE_KEY is missing.'; exit 1; }
+          umask 077
+          printf '%s\n' "$DEPLOY_KEY" | tr -d '\r' > "$RUNNER_TEMP/nganzi-key"
+          ssh-keygen -y -P '' -f "$RUNNER_TEMP/nganzi-key" > /dev/null
+          cat > "$RUNNER_TEMP/nganzi-ssh" <<EOF
+          Host nganzi-deploy
+            HostName $DEPLOY_HOST
+            Port $DEPLOY_PORT
+            User $DEPLOY_USER
+            IdentityFile $RUNNER_TEMP/nganzi-key
+            IdentitiesOnly yes
+            BatchMode yes
+            StrictHostKeyChecking yes
+            HostKeyAlgorithms ssh-ed25519
+            UserKnownHostsFile $GITHUB_WORKSPACE/deployment/spaceship/known_hosts
+            ConnectTimeout 20
+            ServerAliveInterval 15
+            ServerAliveCountMax 3
+          EOF
+
+      - name: Check hosting connection and prerequisites
+        run: ssh -F "$RUNNER_TEMP/nganzi-ssh" nganzi-deploy 'bash -s' < deployment/spaceship/check.sh
+
+      - name: Check revision is still current
+        if: github.event_name != 'workflow_dispatch'
+        id: revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          current=$(git ls-remote origin refs/heads/main | cut -f1)
+          if [ "$current" = "$GITHUB_SHA" ]; then
+            echo 'current=true' >> "$GITHUB_OUTPUT"
           else
-            echo "configured=true" >> $GITHUB_OUTPUT
+            echo 'Skipping a superseded commit; the newer main run will deploy.' >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Execute Remote Deployment via SSH
-        if: steps.check_secrets.outputs.configured == 'true'
-        uses: appleboy/ssh-action@v1.2.0
+      - name: Download tested release from this CI run
+        if: steps.revision.outputs.current == 'true'
+        uses: actions/download-artifact@v4
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER || 'ubuntu' }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          script: |
-            cd /var/www/nganzicoffee.com
-            bash deploy.sh
+          name: spaceship-release
+          path: release-artifact
+
+      - name: Transfer tested release
+        if: steps.revision.outputs.current == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -F "$RUNNER_TEMP/nganzi-ssh" nganzi-deploy 'umask 077; mkdir -p "$HOME/.nganzi-deploy/incoming"'
+          scp -F "$RUNNER_TEMP/nganzi-ssh" release-artifact/release.tar.gz "nganzi-deploy:.nganzi-deploy/incoming/$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.tar.gz"
+
+      - name: Back up and deploy on Spaceship
+        if: steps.revision.outputs.current == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          digest=$(sha256sum release-artifact/release.tar.gz | cut -d' ' -f1)
+          ssh -F "$RUNNER_TEMP/nganzi-ssh" nganzi-deploy "bash -s -- '$GITHUB_SHA' '$GITHUB_RUN_ID' '$GITHUB_RUN_ATTEMPT' '$digest'" < deployment/spaceship/deploy.sh
+          printf 'Deployed `%s` to https://nganzicoffee.com\n' "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Connection test result
+        if: github.event_name == 'workflow_dispatch'
+        run: echo 'SSH access and hosting prerequisites passed. No website files were changed.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove temporary SSH credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/nganzi-key" "$RUNNER_TEMP/nganzi-ssh"

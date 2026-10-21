@@ -82,20 +82,47 @@ never point to production.
 Existing generated Wayfinder files allow local frontend builds with
 `SKIP_WAYFINDER=1`; normal builds regenerate helpers using Artisan.
 
-## Deployment connection: pending
+## Automatic deployment
 
-Automatic deployment has deliberately been disabled. The remaining manual
-workflow and root `deploy.sh` target a legacy Ubuntu VPS, not this host.
-Do not run them or add credentials to activate them for Spaceship.
+`.github/workflows/tests.yml` checks pushes and pull requests. After successful
+checks on a push to `main`, it builds a production package from that exact commit,
+adds compiled frontend assets and production PHP dependencies, and calls
+`.github/workflows/deploy.yml`. Pull requests never deploy. No Node/Composer
+installation or GitHub repository key is needed on the shared host.
 
-Next, configure a separate deployment key and a Spaceship-specific workflow that
-builds tested source in GitHub Actions, transfers the selected revision, uses
-the correct PHP runtime, preserves live data/custom index, runs migrations,
-copies built/editorial assets to the separate document root, and verifies health.
-Configure host key verification and backups before enabling automatic deployment.
-Do not use the developer's personal SSH key or change the server APP_KEY.
+Required repository Actions secrets:
 
-The previous chat proposed SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PRIVATE_KEY,
-APP_PATH and PUBLIC_PATH. The legacy workflow instead reads SSH_USER/SSH_KEY.
-Choose the final secret names when replacing that workflow; adding secrets alone
-does not connect this repository to hosting.
+| Name              | Value                                                          |
+| ----------------- | -------------------------------------------------------------- |
+| `SSH_HOST`        | `66.29.148.167`                                                |
+| `SSH_PORT`        | `21098`                                                        |
+| `SSH_USERNAME`    | `qpcgrmbjuy`                                                   |
+| `SSH_PRIVATE_KEY` | Dedicated authorized OpenSSH private key; preserve line breaks |
+
+The workflow pins the verified server ED25519 key in
+`deployment/spaceship/known_hosts`. Do not disable host verification. Replace that
+public key only after verifying a real hosting server-key change.
+
+For a connection-only test, open Actions → Spaceship deployment → Run workflow
+on `main`. Running this workflow directly checks credentials and prerequisites
+without changing the website. Normal deployment is called only after CI passes.
+The last main revision is checked before uploading, and deployments are serialized.
+
+`deployment/spaceship/deploy.sh` verifies the package checksum, takes database and
+application/asset backups, enters maintenance mode briefly, synchronizes code,
+runs migrations, copies public assets and clears caches. It keeps `.env`, uploads,
+the database, custom public `index.php`, `.htaccess` and public storage link.
+Health checks cover `/up` and `/shop`. A successful deployment writes its commit
+to https://nganzicoffee.com/deployment-revision.txt for verification against GitHub.
+
+Backups are private under `~/.nganzi-deploy/backups/`; the latest five successful
+deployment backups are retained. Failed staging files remain for investigation.
+Successful staging packages are removed. Keep independent off-host backups too.
+On failure after source changes, file rollback is attempted and the workflow
+fails visibly. Database migrations are never reversed automatically: investigate
+schema compatibility before manually restoring a database backup. Use backward
+compatible migrations and do not deploy development seeders.
+
+Use the Actions run's deploy job logs and summary to verify deployment, not just
+the CI check. Root `deploy.sh` remains a legacy Ubuntu example; do not run it on
+Spaceship. Do not regenerate the server's APP_KEY or replace its `.env`.

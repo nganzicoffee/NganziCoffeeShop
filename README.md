@@ -167,7 +167,8 @@ inventory reservation has expired.
 Current hosting instructions and the collaborator handoff are in
 [deployment/SPACESHIP.md](deployment/SPACESHIP.md). The existing root `deploy.sh`
 and Ubuntu guide are legacy VPS examples; do not run them on Spaceship.
-Automatic deployment is paused until the Spaceship workflow is configured.
+Passing pushes to `main` deploy through the Spaceship workflow using repository
+Actions secrets. Direct runs of “Spaceship deployment” only test the connection.
 General requirements:
 
 - Set `APP_ENV=production`, `APP_DEBUG=false`.
