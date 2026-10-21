@@ -33,6 +33,30 @@ Live customer data and uploaded images cannot be made identical to a Git checkou
 
 ## Editing and validation
 
+### Finding storefront controls
+
+| Element                                           | Markup / behavior                              | Styling                                                                                                  |
+| ------------------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Shop hero order/call buttons and marketplace logo | `resources/js/pages/shop/index.tsx`            | `resources/css/site.css`: `.shop-page-actions`, `.shop-marketplace-logo`, and their mobile media queries |
+| Product call, cart and details buttons            | `resources/js/components/shop/ProductCard.tsx` | Component classes and `.shop-roast-*` rules in `site.css`                                                |
+| Header navigation and currency selector           | `resources/js/components/shop/ShopHeader.tsx`  | `site.css` and component classes                                                                         |
+| Footer contacts and WhatsApp                      | `resources/js/components/shop/ShopFooter.tsx`  | `.site-footer` rules in `site.css`                                                                       |
+
+Marvin's `be76ccd` mobile button correction is preserved in `site.css`.
+The homepage gallery is in `resources/js/pages/welcome.tsx`, with images under
+`public/assets/images/farm-gallery-*.webp`. The page entrance animation is in
+`resources/js/layouts/shop/ShopLayout.tsx`; product details are in
+`resources/js/pages/shop/product.tsx`. Their styles remain in `site.css`.
+Keep edits in these established files rather than creating a second storefront.
+Git compares every tracked file against the remote revision; the only difference
+when integrating `be76ccd` was that CSS file. The current PHP failures concern
+response APIs and static analysis, not the shared-hosting directory structure.
+
+All Markdown documentation is retained. The legacy VPS files are clearly labeled
+and kept for reference; follow this guide for current Spaceship hosting.
+Marvin's later gallery, product-detail/card, password-change OTP and admin dark-mode
+updates are also preserved. Pull the current `main` before starting new edits.
+
 Install supported PHP (production uses 8.5), Composer 2, Node 24 and MySQL.
 Follow README local setup with a local `.env` and an isolated database. Never
 copy customer data or production passwords into the repository.
@@ -48,9 +72,15 @@ php artisan test
 ```
 
 Backend tests require development dependencies and the isolated `nganzi_test`
-database from phpunit.xml. They have not been executed in this workstation's
-PHP 8.2 environment. Existing generated Wayfinder files allow local frontend
-builds with `SKIP_WAYFINDER=1`; normal builds regenerate helpers using Artisan.
+database from phpunit.xml. GitHub CI uses MySQL and PHP 8.5. The complete CI run
+for application revision `36380df` passed on 21 October 2026:
+https://github.com/nganzicoffee/NganziCoffeeShop/actions/runs/39510261937
+The response-header and locked-image-count errors were fixed without suppressing
+or weakening analysis rules. An isolated PHP 8.5.11 runtime was also used locally
+for PHPStan and in-memory SQLite tests during review; local test databases must
+never point to production.
+Existing generated Wayfinder files allow local frontend builds with
+`SKIP_WAYFINDER=1`; normal builds regenerate helpers using Artisan.
 
 ## Deployment connection: pending
 
