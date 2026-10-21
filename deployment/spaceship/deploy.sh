@@ -25,7 +25,9 @@ if tar -tzf "$archive" | grep -Eq '(^/|(^|/)\.\.(/|$))'; then
     exit 1
 fi
 mkdir -p "$stage" "$backup/app" "$backup/public"
-tar -xzf "$archive" -C "$stage"
+# Private parent directories protect staging; preserve package modes within it.
+tar --no-same-owner --same-permissions -xzf "$archive" -C "$stage"
+chmod 755 "$stage"
 test -f "$stage/vendor/autoload.php"
 test -f "$stage/public/build/manifest.json"
 test ! -e "$stage/.env"
@@ -61,9 +63,10 @@ rollback() {
         done
         for directory in build assets; do
             if [ -d "$backup/public/$directory" ]; then
-                rsync -a --delete "$backup/public/$directory/" "$public/$directory/" || true
+                rsync -a --delete --chmod=D755,F644 "$backup/public/$directory/" "$public/$directory/" || true
             fi
         done
+        chmod 755 "$public" || true
         cd "$app"
         nganzi_php artisan config:clear || true
         nganzi_php artisan route:clear || true
@@ -92,11 +95,12 @@ nganzi_php artisan view:clear
 
 # Preserve the domain's customized index.php, .htaccess and storage link.
 mkdir -p "$public/build" "$public/assets"
-rsync -a --exclude '/manifest.json' "$stage/public/build/" "$public/build/"
+rsync -a --chmod=D755,F644 --exclude '/manifest.json' "$stage/public/build/" "$public/build/"
 cp "$stage/public/build/manifest.json" "$public/build/manifest.json.next"
 mv "$public/build/manifest.json.next" "$public/build/manifest.json"
-rsync -a --delete "$stage/public/assets/" "$public/assets/"
-rsync -a --exclude '/index.php' --exclude '/.htaccess' --exclude '/storage' --exclude '/build/' --exclude '/assets/' "$stage/public/" "$public/"
+rsync -a --delete --chmod=D755,F644 "$stage/public/assets/" "$public/assets/"
+rsync -a --chmod=D755,F644 --exclude '/index.php' --exclude '/.htaccess' --exclude '/storage' --exclude '/build/' --exclude '/assets/' "$stage/public/" "$public/"
+chmod 755 "$public"
 if [ ! -e "$public/storage" ] && [ ! -L "$public/storage" ]; then
     ln -s "$app/storage/app/public" "$public/storage"
 fi
