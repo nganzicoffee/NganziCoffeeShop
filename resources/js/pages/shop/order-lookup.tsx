@@ -126,7 +126,8 @@ export default function OrderLookup() {
                         Guest order access
                     </p>
                     <h1 className="mb-4 text-brown">
-                        Track your <span className="script-accent">orders.</span>
+                        Track your{' '}
+                        <span className="script-accent">orders.</span>
                     </h1>
                     <p className="max-w-2xl text-base leading-7 text-muted">
                         Use the email from checkout to securely see your order
@@ -159,7 +160,10 @@ export default function OrderLookup() {
                                     We’ll email you a one-time code. Enter it
                                     here to see orders placed with this address.
                                 </p>
-                                <form onSubmit={requestCode} className="space-y-4">
+                                <form
+                                    onSubmit={requestCode}
+                                    className="space-y-4"
+                                >
                                     <label
                                         htmlFor="lookup-email"
                                         className="block text-sm font-semibold text-brown"
@@ -179,7 +183,7 @@ export default function OrderLookup() {
                                             )
                                         }
                                         placeholder="you@example.com"
-                                        className="min-h-12 w-full border border-border bg-white px-4 text-brown outline-none transition focus:border-orange focus:ring-2 focus:ring-orange/20"
+                                        className="min-h-12 w-full border border-border bg-white px-4 text-brown transition outline-none focus:border-orange focus:ring-2 focus:ring-orange/20"
                                     />
                                     {emailForm.errors.email && (
                                         <p className="text-sm text-red-700">
@@ -251,42 +255,52 @@ export default function OrderLookup() {
                                         Email verification code
                                     </legend>
                                     <div className="mx-auto grid max-w-[22rem] grid-cols-6 gap-2 sm:gap-3">
-                                        {Array.from({ length: 6 }, (_, index) => (
-                                            <input
-                                                key={index}
-                                                ref={(element) => {
-                                                    codeInputs.current[index] =
-                                                        element;
-                                                }}
-                                                type="text"
-                                                inputMode="numeric"
-                                                autoComplete={
-                                                    index === 0
-                                                        ? 'one-time-code'
-                                                        : 'off'
-                                                }
-                                                aria-label={'Code digit ' + (index + 1)}
-                                                maxLength={index === 0 ? 6 : 1}
-                                                value={
-                                                    codeForm.data.code[index] ??
-                                                    ''
-                                                }
-                                                onChange={(event) =>
-                                                    updateCode(
-                                                        index,
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                onPaste={pasteCode}
-                                                onKeyDown={(event) =>
-                                                    moveBackOnDelete(
-                                                        index,
-                                                        event,
-                                                    )
-                                                }
-                                                className="h-12 w-full min-w-0 px-0 border border-border bg-white text-center font-mono text-xl font-semibold text-brown outline-none focus:border-orange focus:ring-2 focus:ring-orange/20"
-                                            />
-                                        ))}
+                                        {Array.from(
+                                            { length: 6 },
+                                            (_, index) => (
+                                                <input
+                                                    key={index}
+                                                    ref={(element) => {
+                                                        codeInputs.current[
+                                                            index
+                                                        ] = element;
+                                                    }}
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    autoComplete={
+                                                        index === 0
+                                                            ? 'one-time-code'
+                                                            : 'off'
+                                                    }
+                                                    aria-label={
+                                                        'Code digit ' +
+                                                        (index + 1)
+                                                    }
+                                                    maxLength={
+                                                        index === 0 ? 6 : 1
+                                                    }
+                                                    value={
+                                                        codeForm.data.code[
+                                                            index
+                                                        ] ?? ''
+                                                    }
+                                                    onChange={(event) =>
+                                                        updateCode(
+                                                            index,
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    onPaste={pasteCode}
+                                                    onKeyDown={(event) =>
+                                                        moveBackOnDelete(
+                                                            index,
+                                                            event,
+                                                        )
+                                                    }
+                                                    className="h-12 w-full min-w-0 border border-border bg-white px-0 text-center font-mono text-xl font-semibold text-brown outline-none focus:border-orange focus:ring-2 focus:ring-orange/20"
+                                                />
+                                            ),
+                                        )}
                                     </div>
                                     {codeForm.errors.code && (
                                         <p
@@ -370,8 +384,7 @@ export default function OrderLookup() {
                                             ? orders.length
                                             : orders.filter(
                                                   (order) =>
-                                                      order.category ===
-                                                      tab.id,
+                                                      order.category === tab.id,
                                               ).length;
 
                                     return (
@@ -379,12 +392,8 @@ export default function OrderLookup() {
                                             key={tab.id}
                                             type="button"
                                             role="tab"
-                                            aria-selected={
-                                                activeTab === tab.id
-                                            }
-                                            onClick={() =>
-                                                setActiveTab(tab.id)
-                                            }
+                                            aria-selected={activeTab === tab.id}
+                                            onClick={() => setActiveTab(tab.id)}
                                             className={[
                                                 'border-b-2 px-3 py-3 text-sm font-semibold transition',
                                                 activeTab === tab.id
@@ -500,7 +509,9 @@ export default function OrderLookup() {
                                                     Total:{' '}
                                                     <ShopPrice
                                                         amount={order.total}
-                                                        currency={order.currency}
+                                                        currency={
+                                                            order.currency
+                                                        }
                                                     />
                                                 </p>
                                             </div>
