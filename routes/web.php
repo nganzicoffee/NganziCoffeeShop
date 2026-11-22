@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\StoreSettingsController;
 use App\Http\Controllers\Admin\VariantController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\CheckoutController;
+use App\Http\Controllers\Shop\OrderLookupController;
 use App\Http\Controllers\Shop\PaymentWebhookController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\Shop\ShopController;
@@ -37,6 +38,10 @@ Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart
 Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/orders/{reference}/{lookupToken}', [CheckoutController::class, 'confirmation'])->name('orders.confirmation');
+Route::get('/track-orders', [OrderLookupController::class, 'index'])->name('orders.lookup');
+Route::post('/track-orders/code', [OrderLookupController::class, 'requestCode'])->middleware('throttle:5,1')->name('orders.lookup.code');
+Route::post('/track-orders/verify', [OrderLookupController::class, 'verifyCode'])->middleware('throttle:10,1')->name('orders.lookup.verify');
+Route::post('/track-orders/forget', [OrderLookupController::class, 'forget'])->name('orders.lookup.forget');
 Route::post('/webhooks/payments', PaymentWebhookController::class)->name('webhooks.payments');
 
 Route::get('/about', [StaticPageController::class, 'about'])->name('about');

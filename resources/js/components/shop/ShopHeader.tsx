@@ -126,6 +126,9 @@ export default function ShopHeader() {
                     <Link href="/coffee" onClick={() => setOpen(false)}>
                         Coffee
                     </Link>
+                    <Link href="/track-orders" onClick={() => setOpen(false)}>
+                        Track orders
+                    </Link>
                     <Link href="/contact" onClick={() => setOpen(false)}>
                         Contact
                     </Link>
